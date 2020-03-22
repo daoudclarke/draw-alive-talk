@@ -34,8 +34,11 @@ var logo;
 
 var worker;
 
+var recorder;
+
 function create ()
 {
+    // Worker
     const { createWorker } = FFmpeg;
     worker = createWorker({
         corePath: '/node_modules/@ffmpeg/core/ffmpeg-core.js',
@@ -47,7 +50,11 @@ function create ()
     var sky = this.add.image(0, 0, 'sky').setScale(1.6).setOrigin(0, 0);
     this.physics.world.setBounds(0, 0, sky.displayWidth, sky.displayHeight);
 
-    // logo = this.physics.add.image(400, 100, 'crocodile-open').setScale(0.5);
+    // Audio
+    
+    recorder = new MicRecorder({
+      bitRate: 128
+    });
 
     let crocodile = this.add.sprite(100, 100, 'crocodile-open');
     let supergranny = this.add.sprite(100, 100, 'supergranny-closed');
@@ -116,7 +123,7 @@ function update ()
 
 async function convert() {
     console.log("Start transcoding");
-    await worker.run('-framerate 30 -pattern_type glob -i *.png -c:a copy -shortest -c:v libx264 -pix_fmt yuv420p out.mp4', { output: 'out.mp4' });
+    await worker.run('-framerate 30 -pattern_type glob -i *.png -i audio.mp3 -c:a copy -shortest -c:v libx264 -pix_fmt yuv420p out.mp4', { output: 'out.mp4' });
     console.log("Finished transcoding");
     const { data } = await worker.read('out.mp4');
     // await worker.remove('audio.ogg');
@@ -129,15 +136,35 @@ async function convert() {
     video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
 }
 
-function progress(p) {
-    console.log(p);
-    if (p.ratio == 1) {
-	load();
+
+var isRecording = false;
+async function record() {
+    if (!isRecording) {
+	isRecording = true;
+	recorder.start().then(() => {
+	    console.log("Started recording");
+	});
+    } else {
+	isRecording = false;
+	recorder.stop().getMp3().then(([buffer, blob]) => {
+            console.log("Got Mp3", buffer, blob);
+	    worker.write("audio.mp3", blob).then(() => {
+		console.log("Write audio mp3");
+	    });
+	});
+
     }
 }
 
-function load() {
-    const { data } = worker.read('out.mp4');
-    const video = document.getElementById('output-video');
-    video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
-}
+// function progress(p) {
+//     console.log(p);
+//     if (p.ratio == 1) {
+// 	load();
+//     }
+// }
+
+// function load() {
+//     const { data } = worker.read('out.mp4');
+//     const video = document.getElementById('output-video');
+//     video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
+// }
