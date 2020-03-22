@@ -2,10 +2,15 @@
 <html>
 <head>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.15.1/dist/phaser-arcade-physics.min.js"></script>
+    <!-- <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.6.1/dist/ffmpeg.min.js"></script> -->
+    <script src="/node_modules/@ffmpeg/ffmpeg/dist/ffmpeg.min.js"></script>
 </head>
 <body>
 
+    <!-- <script src="ffmpeg.min.js"></script> -->
     <script src="main.js"></script>
-
+    <button id="convert" onclick="convert()">Convert</button>
+    <button id="load" onclick="load()">Load</button>
+    <video id="output-video" controls></video><br/>
 </body>
 </html>

@@ -1,5 +1,5 @@
 var config = {
-    type: Phaser.AUTO,
+    type: Phaser.CANVAS,
     width: 1280,
     height: 720,
     physics: {
@@ -32,8 +32,18 @@ function preload ()
 var cursors;
 var logo;
 
+var worker;
+
 function create ()
 {
+    const { createWorker } = FFmpeg;
+    worker = createWorker({
+        corePath: '/node_modules/@ffmpeg/core/ffmpeg-core.js',
+        progress: (p) => console.log(p),
+      });
+    worker.load();
+    console.log("Loaded worker");
+    
     var sky = this.add.image(0, 0, 'sky').setScale(1.6).setOrigin(0, 0);
     this.physics.world.setBounds(0, 0, sky.displayWidth, sky.displayHeight);
 
@@ -49,12 +59,20 @@ function create ()
         s.setInteractive();
         this.input.setDraggable(s);
     }
+
+    let i = 0;
     this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
 
+	i++;
         gameObject.x = dragX;
         gameObject.y = dragY;
 
+	var dt = game.canvas.toDataURL('image/png');
+	const num = `00${i}`.slice(-3);
+	worker.write(`tmp.${num}.png`, dt);
+	console.log("Wrote " + num);
     });
+    
     // this.physics.setGravity(1.0);
 
     // logo.setVelocity(0, 200);
@@ -68,7 +86,8 @@ function create ()
     // keyObj.on('up', function(event) { logo.setVelocity(-100, 0); });
 
     // this.cameras.main.startFollow(logo);
-    this.cameras.main.setBounds(0, 0, sky.displayWidth, sky.displayHeight)
+    this.cameras.main.setBounds(0, 0, sky.displayWidth, sky.displayHeight);
+
 }
 
 function update ()
@@ -92,4 +111,23 @@ function update ()
     // // {
     // //     logo.setVelocityY(300);
     // // }
+}
+
+
+function convert() {
+    console.log("Converting");
+    worker.run('-framerate 30 -pattern_type glob -i *.png -c:a copy -shortest -c:v libx264 -pix_fmt yuv420p out.mp4', { output: 'out.mp4' });
+}
+
+function progress(p) {
+    console.log(p);
+    if (p.ratio == 1) {
+	load();
+    }
+}
+
+function load() {
+    const { data } = worker.read('out.mp4');
+    const video = document.getElementById('output-video');
+    video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
 }
