@@ -115,16 +115,6 @@ function update ()
 
 
 async function convert() {
-    // const message = document.getElementById('message');
-    // message.innerHTML = 'Loading ffmpeg-core.js';
-    // await worker.load();
-    // message.innerHTML = 'Loading data';
-    // await worker.write('audio.ogg', '../../tests/assets/triangle/audio.ogg');
-    // for (let i = 0; i < 60; i += 1) {
-    //     const num = `00${i}`.slice(-3);
-    //     await worker.write(`tmp.${num}.png`, `../../tests/assets/triangle/tmp.${num}.png`);
-    // }
-    // message.innerHTML = 'Start transcoding';
     console.log("Start transcoding");
     await worker.run('-framerate 30 -pattern_type glob -i *.png -c:a copy -shortest -c:v libx264 -pix_fmt yuv420p out.mp4', { output: 'out.mp4' });
     console.log("Finished transcoding");
@@ -137,8 +127,6 @@ async function convert() {
 
     const video = document.getElementById('output-video');
     video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
-    // console.log("Converting");
-    // worker.run('-framerate 30 -pattern_type glob -i *.png -c:a copy -shortest -c:v libx264 -pix_fmt yuv420p out.mp4', { output: 'out.mp4' });
 }
 
 function progress(p) {
