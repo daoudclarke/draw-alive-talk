@@ -32,21 +32,13 @@ function preload ()
 var cursors;
 var logo;
 
-var worker;
-
 var recorder;
+
+var frames = [];
+var timestamps = [];
 
 function create ()
 {
-    // Worker
-    const { createWorker } = FFmpeg;
-    worker = createWorker({
-        corePath: '/node_modules/@ffmpeg/core/ffmpeg-core.js',
-        progress: (p) => console.log(p),
-      });
-    worker.load();
-    console.log("Loaded worker");
-    
     var sky = this.add.image(0, 0, 'sky').setScale(1.6).setOrigin(0, 0);
     this.physics.world.setBounds(0, 0, sky.displayWidth, sky.displayHeight);
 
@@ -67,17 +59,11 @@ function create ()
         this.input.setDraggable(s);
     }
 
-    let i = 0;
     this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
-
-	i++;
         gameObject.x = dragX;
         gameObject.y = dragY;
-
-	var dt = game.canvas.toDataURL('image/png');
-	const num = `00${i}`.slice(-3);
-	worker.write(`tmp.${num}.png`, dt);
-	console.log("Wrote " + num);
+	
+	newFrame();
     });
     
     // this.physics.setGravity(1.0);
@@ -121,9 +107,44 @@ function update ()
 }
 
 
+function newFrame() {
+    var dt = game.canvas.toDataURL('image/png');
+    frames.push(dt);
+    timestamps.push(new Date());
+    console.log("Stored frames " + frames.length);
+}
+
 async function convert() {
+    // Worker
+    const { createWorker } = FFmpeg;
+    const worker = createWorker({
+        corePath: '/node_modules/@ffmpeg/core/ffmpeg-core.js',
+        progress: (p) => console.log(p),
+      });
+    await worker.load();
+    console.log("Loaded worker");
+    
+    await worker.write("audio.mp3", recording);
+
+    text = "";
+    console.log("Timestamps", timestamps);
+    for (var i=0; i<frames.length; ++i) {
+	const num = `00${i}`.slice(-3);
+	await worker.write(`tmp.${num}.png`, frames[i]);
+	
+	duration = (timestamps[i + 1] - timestamps[i])/1000;
+	text += `file tmp.${num}.png\n`;
+	text += 'duration ' + duration + '\n';
+
+    	console.log("Wrote " + num + " " + duration);
+    }
+
+    console.log("Text file\n" + text);
+
+    await worker.writeText("durations.txt", text);
+    
     console.log("Start transcoding");
-    await worker.run('-framerate 30 -pattern_type glob -i *.png -i audio.mp3 -c:a copy -shortest -c:v libx264 -pix_fmt yuv420p out.mp4', { output: 'out.mp4' });
+    await worker.run('-framerate 30 -f concat -i durations.txt -i audio.mp3 out.mp4', { output: 'out.mp4' });
     console.log("Finished transcoding");
     const { data } = await worker.read('out.mp4');
     // await worker.remove('audio.ogg');
@@ -138,19 +159,25 @@ async function convert() {
 
 
 var isRecording = false;
+var recording = null;
 async function record() {
     if (!isRecording) {
 	isRecording = true;
 	recorder.start().then(() => {
 	    console.log("Started recording");
+	    newFrame();
 	});
     } else {
 	isRecording = false;
+	timestamps.push(new Date());
 	recorder.stop().getMp3().then(([buffer, blob]) => {
             console.log("Got Mp3", buffer, blob);
-	    worker.write("audio.mp3", blob).then(() => {
-		console.log("Write audio mp3");
-	    });
+	    recording = blob;
+	    convert();
+	    // worker.write("audio.mp3", blob).then(() => {
+	    // 	console.log("Write audio mp3");
+	    // 	convert();
+	    // });
 	});
 
     }
