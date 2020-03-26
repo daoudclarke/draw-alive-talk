@@ -165,7 +165,10 @@ async function record() {
     if (!isRecording) {
 	console.log("Starting recording");
 	isRecording = true;
-	let stream = game.canvas.captureStream(30);
+	
+	let audioStream = await navigator.mediaDevices.getUserMedia({audio: true});
+	let canvasStream = game.canvas.captureStream(30);
+	let stream = new MediaStream([audioStream.getTracks()[0], canvasStream.getTracks()[0]]);
 
 	// const video = document.getElementById('output-video');
 	// video.srcObject = stream;
