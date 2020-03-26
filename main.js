@@ -32,10 +32,10 @@ function preload ()
 var cursors;
 var logo;
 
-var recorder;
+// var recorder;
 
-var frames = [];
-var timestamps = [];
+// var frames = [];
+// var timestamps = [];
 
 function create ()
 {
@@ -44,9 +44,9 @@ function create ()
 
     // Audio
     
-    recorder = new MicRecorder({
-      bitRate: 128
-    });
+    // recorder = new MicRecorder({
+    //   bitRate: 128
+    // });
 
     let crocodile = this.add.sprite(100, 100, 'crocodile-open');
     let supergranny = this.add.sprite(100, 100, 'supergranny-closed');
@@ -63,7 +63,7 @@ function create ()
         gameObject.x = dragX;
         gameObject.y = dragY;
 	
-	newFrame();
+	// newFrame();
     });
     
     // this.physics.setGravity(1.0);
@@ -107,78 +107,100 @@ function update ()
 }
 
 
-function newFrame() {
-    var dt = game.canvas.toDataURL('image/png');
-    frames.push(dt);
-    timestamps.push(new Date());
-    console.log("Stored frames " + frames.length);
-}
+// function newFrame() {
+//     var dt = game.canvas.toDataURL('image/png');
+//     frames.push(dt);
+//     timestamps.push(new Date());
+//     console.log("Stored frames " + frames.length);
+// }
 
-async function convert() {
-    // Worker
-    const { createWorker } = FFmpeg;
-    const worker = createWorker({
-        corePath: '/node_modules/@ffmpeg/core/ffmpeg-core.js',
-        progress: (p) => console.log(p),
-      });
-    await worker.load();
-    console.log("Loaded worker");
+// async function convert() {
+//     // Worker
+//     const { createWorker } = FFmpeg;
+//     const worker = createWorker({
+//         corePath: '/node_modules/@ffmpeg/core/ffmpeg-core.js',
+//         progress: (p) => console.log(p),
+//       });
+//     await worker.load();
+//     console.log("Loaded worker");
     
-    await worker.write("audio.mp3", recording);
+//     await worker.write("audio.mp3", recording);
 
-    text = "";
-    console.log("Timestamps", timestamps);
-    for (var i=0; i<frames.length; ++i) {
-	const num = `00${i}`.slice(-3);
-	await worker.write(`tmp.${num}.png`, frames[i]);
+//     text = "";
+//     console.log("Timestamps", timestamps);
+//     for (var i=0; i<frames.length; ++i) {
+// 	const num = `00${i}`.slice(-3);
+// 	await worker.write(`tmp.${num}.png`, frames[i]);
 	
-	duration = (timestamps[i + 1] - timestamps[i])/1000;
-	text += `file tmp.${num}.png\n`;
-	text += 'duration ' + duration + '\n';
+// 	duration = (timestamps[i + 1] - timestamps[i])/1000;
+// 	text += `file tmp.${num}.png\n`;
+// 	text += 'duration ' + duration + '\n';
 
-    	console.log("Wrote " + num + " " + duration);
-    }
+//     	console.log("Wrote " + num + " " + duration);
+//     }
 
-    console.log("Text file\n" + text);
+//     console.log("Text file\n" + text);
 
-    await worker.writeText("durations.txt", text);
+//     await worker.writeText("durations.txt", text);
     
-    console.log("Start transcoding");
-    await worker.run('-framerate 30 -f concat -i durations.txt -i audio.mp3 out.mp4', { output: 'out.mp4' });
-    console.log("Finished transcoding");
-    const { data } = await worker.read('out.mp4');
-    // await worker.remove('audio.ogg');
-    // for (let i = 0; i < 60; i += 1) {
-    //     const num = `00${i}`.slice(-3);
-    //     await worker.remove(`tmp.${num}.png`);
-    // }
+//     console.log("Start transcoding");
+//     await worker.run('-framerate 30 -f concat -i durations.txt -i audio.mp3 out.mp4', { output: 'out.mp4' });
+//     console.log("Finished transcoding");
+//     const { data } = await worker.read('out.mp4');
+//     // await worker.remove('audio.ogg');
+//     // for (let i = 0; i < 60; i += 1) {
+//     //     const num = `00${i}`.slice(-3);
+//     //     await worker.remove(`tmp.${num}.png`);
+//     // }
 
-    const video = document.getElementById('output-video');
-    video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
-}
+//     const video = document.getElementById('output-video');
+//     video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
+// }
 
 
 var isRecording = false;
 var recording = null;
+var recorder;
 async function record() {
     if (!isRecording) {
+	console.log("Starting recording");
 	isRecording = true;
-	recorder.start().then(() => {
-	    console.log("Started recording");
-	    newFrame();
-	});
+	let stream = game.canvas.captureStream(30);
+
+	// const video = document.getElementById('output-video');
+	// video.srcObject = stream;
+
+	recorder = new MediaRecorder(stream);
+
+	chunks = [];
+	recorder.ondataavailable = function(e) {
+	    chunks.push(e.data);
+	    console.log("Pushing chunk " + chunks.length);
+	}
+
+	recorder.start();
+
+	recorder.onstop = function(e) {
+	    console.log("Stopped");
+	    const blob = new Blob(chunks, { 'type' : 'video/mpeg-4' });
+	    chunks = [];
+	    const video = document.getElementById('output-video');
+	    video.src = URL.createObjectURL(blob, { type: 'video/mp4' });
+	}
+	
     } else {
 	isRecording = false;
-	timestamps.push(new Date());
-	recorder.stop().getMp3().then(([buffer, blob]) => {
-            console.log("Got Mp3", buffer, blob);
-	    recording = blob;
-	    convert();
-	    // worker.write("audio.mp3", blob).then(() => {
-	    // 	console.log("Write audio mp3");
-	    // 	convert();
-	    // });
-	});
+	recorder.stop();
+	// timestamps.push(new Date());
+	// recorder.stop().getMp3().then(([buffer, blob]) => {
+        //     console.log("Got Mp3", buffer, blob);
+	//     recording = blob;
+	//     convert();
+	//     // worker.write("audio.mp3", blob).then(() => {
+	//     // 	console.log("Write audio mp3");
+	//     // 	convert();
+	//     // });
+	// });
 
     }
 }
