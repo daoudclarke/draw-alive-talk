@@ -86,9 +86,7 @@ function create ()
     document.querySelector('input[type="file"]').addEventListener('change', function() {
 	if (this.files && this.files[0]) {
 	    console.log("Got files", this.files)
-            // var img = document.querySelector('img');  // $('img')[0]
             imgUrl = URL.createObjectURL(this.files[0]); // set src to blob url
-            // img.onload = imageIsLoaded;
 	    uploadName = Math.random().toString(36).substring(2, 15);
 	    console.log("Uploaded", uploadName);
 	    ourGame.load.image(uploadName, imgUrl);
@@ -116,9 +114,6 @@ async function record() {
 	let canvasStream = game.canvas.captureStream(30);
 	let stream = new MediaStream([audioStream.getTracks()[0], canvasStream.getTracks()[0]]);
 
-	// const video = document.getElementById('output-video');
-	// video.srcObject = stream;
-
 	recorder = new MediaRecorder(stream);
 
 	chunks = [];
@@ -140,38 +135,5 @@ async function record() {
     } else {
 	isRecording = false;
 	recorder.stop();
-	// timestamps.push(new Date());
-	// recorder.stop().getMp3().then(([buffer, blob]) => {
-        //     console.log("Got Mp3", buffer, blob);
-	//     recording = blob;
-	//     convert();
-	//     // worker.write("audio.mp3", blob).then(() => {
-	//     // 	console.log("Write audio mp3");
-	//     // 	convert();
-	//     // });
-	// });
-
     }
-}
-
-// function progress(p) {
-//     console.log(p);
-//     if (p.ratio == 1) {
-// 	load();
-//     }
-// }
-
-// function load() {
-//     const { data } = worker.read('out.mp4');
-//     const video = document.getElementById('output-video');
-//     video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
-// }
-
-
-// window.addEventListener('load', function() {
-// });
-
-function imageIsLoaded() { 
-  alert(this.src);  // blob url
-  // update width and height ...
 }
