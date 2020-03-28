@@ -66,44 +66,40 @@ function create ()
 	// newFrame();
     });
     
-    // this.physics.setGravity(1.0);
-
-    // logo.setVelocity(0, 200);
-    // logo.setBounce(0.0, 0.0);
-    // logo.setCollideWorldBounds(true);
-
-    // cursors = this.input.keyboard.createCursorKeys();
-
-    // var keyObj = this.input.keyboard.addKey('RIGHT');  // Get key object
-    // keyObj.on('down', function(event) { logo.setVelocity(100, 0); });
-    // keyObj.on('up', function(event) { logo.setVelocity(-100, 0); });
-
-    // this.cameras.main.startFollow(logo);
     this.cameras.main.setBounds(0, 0, sky.displayWidth, sky.displayHeight);
+
+    let ourGame = this;
+
+
+    let uploadName = null; 
+
+    function addNextFile() {
+	console.log("Adding file " + uploadName);
+	let uploadedSprite = this.add.sprite(100, 100, uploadName);
+	uploadedSprite.setScale(0.5);
+	uploadedSprite.setInteractive();
+	this.input.setDraggable(uploadedSprite);
+    }
+
+    ourGame.load.on('filecomplete', addNextFile, ourGame);
+    
+    document.querySelector('input[type="file"]').addEventListener('change', function() {
+	if (this.files && this.files[0]) {
+	    console.log("Got files", this.files)
+            // var img = document.querySelector('img');  // $('img')[0]
+            imgUrl = URL.createObjectURL(this.files[0]); // set src to blob url
+            // img.onload = imageIsLoaded;
+	    uploadName = Math.random().toString(36).substring(2, 15);
+	    console.log("Uploaded", uploadName);
+	    ourGame.load.image(uploadName, imgUrl);
+	    ourGame.load.start();
+	}
+    });
 
 }
 
 function update ()
 {
-    // // logo.setVelocity(0);
-    //
-    // if (cursors.left.isDown)
-    // {
-    //     logo.setVelocityX(-300);
-    // }
-    // else if (cursors.right.isDown)
-    // {
-    //     logo.setVelocityX(300);
-    // }
-    //
-    // if (cursors.up.isDown && logo.body.onFloor())
-    // {
-    //     logo.setVelocityY(-300);
-    // }
-    // // else if (cursors.down.isDown)
-    // // {
-    // //     logo.setVelocityY(300);
-    // // }
 }
 
 
@@ -170,15 +166,10 @@ async function record() {
 //     const video = document.getElementById('output-video');
 //     video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
 // }
-window.addEventListener('load', function() {
-  document.querySelector('input[type="file"]').addEventListener('change', function() {
-      if (this.files && this.files[0]) {
-          var img = document.querySelector('img');  // $('img')[0]
-          img.src = URL.createObjectURL(this.files[0]); // set src to blob url
-          img.onload = imageIsLoaded;
-      }
-  });
-});
+
+
+// window.addEventListener('load', function() {
+// });
 
 function imageIsLoaded() { 
   alert(this.src);  // blob url
