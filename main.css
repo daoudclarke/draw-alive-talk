@@ -1,0 +1,32 @@
+*{padding:0;margin:0;}
+
+body{
+	font-family:Verdana, Geneva, sans-serif;
+	font-size:18px;
+	background-color:#CCC;
+}
+
+.float{
+	position:fixed;
+	width:60px;
+	height:60px;
+	background-color:#fff;
+	color:#F00;
+	border-radius:50px;
+	text-align:center;
+	box-shadow: 2px 2px 3px #999;
+}
+
+.record-button {
+	top:40px;
+	left:40px;
+}
+
+.add-button {
+	top:40px;
+	left:80px;
+}
+
+.my-float{
+	margin-top:22px;
+}
