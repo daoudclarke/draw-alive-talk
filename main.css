@@ -8,6 +8,8 @@ body{
 
 .float{
 	position:fixed;
+	top:40px;
+	left:40px;
 	width:60px;
 	height:60px;
 	background-color:#fff;
@@ -17,15 +19,15 @@ body{
 	box-shadow: 2px 2px 3px #999;
 }
 
-.record-button {
-	top:40px;
-	left:40px;
-}
+/* .record-button { */
+/* 	top:40px; */
+/* 	left:40px; */
+/* } */
 
-.add-button {
-	top:40px;
-	left:80px;
-}
+/* .add-button { */
+/* 	top:40px; */
+/* 	left:80px; */
+/* } */
 
 .my-float{
 	margin-top:22px;
