@@ -107,56 +107,6 @@ function update ()
 }
 
 
-// function newFrame() {
-//     var dt = game.canvas.toDataURL('image/png');
-//     frames.push(dt);
-//     timestamps.push(new Date());
-//     console.log("Stored frames " + frames.length);
-// }
-
-// async function convert() {
-//     // Worker
-//     const { createWorker } = FFmpeg;
-//     const worker = createWorker({
-//         corePath: '/node_modules/@ffmpeg/core/ffmpeg-core.js',
-//         progress: (p) => console.log(p),
-//       });
-//     await worker.load();
-//     console.log("Loaded worker");
-    
-//     await worker.write("audio.mp3", recording);
-
-//     text = "";
-//     console.log("Timestamps", timestamps);
-//     for (var i=0; i<frames.length; ++i) {
-// 	const num = `00${i}`.slice(-3);
-// 	await worker.write(`tmp.${num}.png`, frames[i]);
-	
-// 	duration = (timestamps[i + 1] - timestamps[i])/1000;
-// 	text += `file tmp.${num}.png\n`;
-// 	text += 'duration ' + duration + '\n';
-
-//     	console.log("Wrote " + num + " " + duration);
-//     }
-
-//     console.log("Text file\n" + text);
-
-//     await worker.writeText("durations.txt", text);
-    
-//     console.log("Start transcoding");
-//     await worker.run('-framerate 30 -f concat -i durations.txt -i audio.mp3 out.mp4', { output: 'out.mp4' });
-//     console.log("Finished transcoding");
-//     const { data } = await worker.read('out.mp4');
-//     // await worker.remove('audio.ogg');
-//     // for (let i = 0; i < 60; i += 1) {
-//     //     const num = `00${i}`.slice(-3);
-//     //     await worker.remove(`tmp.${num}.png`);
-//     // }
-
-//     const video = document.getElementById('output-video');
-//     video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
-// }
-
 
 var isRecording = false;
 var recording = null;
@@ -220,3 +170,17 @@ async function record() {
 //     const video = document.getElementById('output-video');
 //     video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
 // }
+window.addEventListener('load', function() {
+  document.querySelector('input[type="file"]').addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+          var img = document.querySelector('img');  // $('img')[0]
+          img.src = URL.createObjectURL(this.files[0]); // set src to blob url
+          img.onload = imageIsLoaded;
+      }
+  });
+});
+
+function imageIsLoaded() { 
+  alert(this.src);  // blob url
+  // update width and height ...
+}
