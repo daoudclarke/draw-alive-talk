@@ -106,7 +106,11 @@ var isRecording = false;
 var recording = null;
 var recorder;
 async function record() {
+    recordButtonClasses = document.getElementById("record-button").classList;
     if (!isRecording) {
+	recordButtonClasses.remove('fa-circle');
+	recordButtonClasses.add('fa-pause');
+	
 	console.log("Starting recording");
 	isRecording = true;
 	
@@ -125,14 +129,18 @@ async function record() {
 	recorder.start();
 
 	recorder.onstop = function(e) {
+	    stream.getTracks()[0].stop();
+	    stream.getTracks()[1].stop();
 	    console.log("Stopped");
 	    const blob = new Blob(chunks, { 'type' : 'video/mpeg-4' });
 	    chunks = [];
-	    const video = document.getElementById('output-video');
-	    video.src = URL.createObjectURL(blob, { type: 'video/mp4' });
+	    url = URL.createObjectURL(blob, { type: 'video/mp4' });
+	    window.open(url);
 	}
 	
     } else {
+	recordButtonClasses.remove('fa-pause');
+	recordButtonClasses.add('fa-circle');
 	isRecording = false;
 	recorder.stop();
     }

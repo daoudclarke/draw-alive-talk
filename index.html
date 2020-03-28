@@ -5,6 +5,9 @@
     <!-- <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.6.1/dist/ffmpeg.min.js"></script> -->
     <!-- <script src="/node_modules/@ffmpeg/ffmpeg/dist/ffmpeg.min.js"></script> -->
     <!-- <script src="micmp3.js"></script> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="main.css">
 </head>
 <body>
 
@@ -13,7 +16,9 @@
     <!-- <script src="ffmpeg.min.js"></script> -->
     <script src="main.js"></script>
     <!-- <button id="convert" onclick="convert()">Convert</button> -->
-    <button id="record" onclick="record()">Record</button>
-    <video id="output-video" controls></video><br/>
+    <a href="#" class="float" onclick="record()">
+      <i id="record-button" class="fa fa-circle my-float"></i>
+    </a>
+    <!-- <button id="record" onclick="record()">Record</button> -->
 </body>
 </html>
