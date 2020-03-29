@@ -108,17 +108,15 @@ function update ()
 
 
 
-var isRecording = false;
 var recording = null;
-var recorder;
+var recorder = null;
 async function record() {
     recordButtonClasses = document.getElementById("record-button").classList;
-    if (!isRecording) {
+    if (recorder === null) {
 	recordButtonClasses.remove('fa-circle');
 	recordButtonClasses.add('fa-pause');
 	
 	console.log("Starting recording");
-	isRecording = true;
 	
 	let audioStream = await navigator.mediaDevices.getUserMedia({audio: true});
 	let canvasStream = game.canvas.captureStream(30);
@@ -135,23 +133,33 @@ async function record() {
 	recorder.start();
 
 	recorder.onstop = function(e) {
+	    console.log("Stopping");
+	    recorder = null;
 	    stream.getTracks()[0].stop();
 	    stream.getTracks()[1].stop();
-	    console.log("Stopped");
 	    const blob = new Blob(chunks, { 'type' : 'video/mpeg-4' });
 	    chunks = [];
 	    url = URL.createObjectURL(blob, { type: 'video/mp4' });
 	    window.open(url);
 	}
 	
-    } else {
+    } else if (recorder.state === 'recording') {
+	console.log("Pausing");
+	recorder.pause();
 	recordButtonClasses.remove('fa-pause');
 	recordButtonClasses.add('fa-circle');
-	isRecording = false;
-	recorder.stop();
+    } else if (recorder.state === 'paused') {
+	console.log("Resuming");
+	recorder.resume();
+	recordButtonClasses.remove('fa-circle');
+	recordButtonClasses.add('fa-pause');
     }
 }
 
 function upload() {
     document.querySelector('input[type="file"]').click();
+}
+
+function stop() {
+    recorder.stop();
 }

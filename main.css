@@ -22,9 +22,14 @@ body{
 	left:40px;
 }
 
-.add-button {
+.stop-button {
 	top:40px;
 	left:120px;
+}
+
+.add-button {
+	top:40px;
+	left:200px;
 }
 
 .my-float{
