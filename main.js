@@ -139,8 +139,7 @@ async function record() {
 	    stream.getTracks()[1].stop();
 	    const blob = new Blob(chunks, { 'type' : 'video/mpeg-4' });
 	    chunks = [];
-	    url = URL.createObjectURL(blob, { type: 'video/mp4' });
-	    window.open(url);
+	    saveAs(blob, "draw-alive-recording.mp4");
 	}
 	
     } else if (recorder.state === 'recording') {
