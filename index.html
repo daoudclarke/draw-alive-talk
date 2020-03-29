@@ -11,13 +11,16 @@
 </head>
 <body>
 
-<input type='file' />
+<input type='file' style="display: none"/>
 <br>
     <!-- <script src="ffmpeg.min.js"></script> -->
     <script src="main.js"></script>
     <!-- <button id="convert" onclick="convert()">Convert</button> -->
-    <a href="#" class="float" onclick="record()">
+    <a href="#" class="float record-button" onclick="record()">
       <i id="record-button" class="fa fa-circle my-float"></i>
+    </a>
+    <a href="#" class="float add-button" onclick="upload()">
+      <i id="record-button" class="fa fa-plus my-float"></i>
     </a>
     <!-- <button id="record" onclick="record()">Record</button> -->
 </body>

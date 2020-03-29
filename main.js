@@ -151,3 +151,7 @@ async function record() {
 	recorder.stop();
     }
 }
+
+function upload() {
+    document.querySelector('input[type="file"]').click();
+}

@@ -8,26 +8,24 @@ body{
 
 .float{
 	position:fixed;
-	top:40px;
-	left:40px;
 	width:60px;
 	height:60px;
 	background-color:#fff;
-	color:#F00;
+	color:#000;
 	border-radius:50px;
 	text-align:center;
 	box-shadow: 2px 2px 3px #999;
 }
 
-/* .record-button { */
-/* 	top:40px; */
-/* 	left:40px; */
-/* } */
+.record-button {
+	top:40px;
+	left:40px;
+}
 
-/* .add-button { */
-/* 	top:40px; */
-/* 	left:80px; */
-/* } */
+.add-button {
+	top:40px;
+	left:120px;
+}
 
 .my-float{
 	margin-top:22px;
