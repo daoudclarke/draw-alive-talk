@@ -46,6 +46,8 @@ var logo;
 // var frames = [];
 // var timestamps = [];
 
+var spriteDepth = 1000;
+
 function create ()
 {
     var sky = this.add.image(0, 0, 'sky').setScale(1.6).setOrigin(0, 0);
@@ -63,11 +65,12 @@ function create ()
 
     let sprites = [crocodile, supergranny];
     for (let i=0; i<sprites.length; ++i) {
+	spriteDepth += 1;
         let s = sprites[i];
         s.setScale(0.5);
         s.setInteractive();
         this.input.setDraggable(s);
-	s.setDepth(i+2);
+	s.setDepth(spriteDepth);
     }
 
     this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
@@ -90,6 +93,8 @@ function create ()
 	    let uploadedSprite = ourGame.add.sprite(100, 100, uploadName);
 	    uploadedSprite.setScale(0.5);
 	    uploadedSprite.setInteractive();
+	    spriteDepth += 1;
+	    uploadedSprite.setDepth(spriteDepth);
 	    ourGame.input.setDraggable(uploadedSprite);
 	} else if (uploadName.startsWith('background')) {
 	    var background = ourGame.add.image(0, 0, uploadName).setScale(1.6).setOrigin(0, 0);
