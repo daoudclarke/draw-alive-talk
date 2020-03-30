@@ -35,6 +35,9 @@ function preload ()
     // this.load.image('red', 'http://labs.phaser.io/assets/particles/red.png');
 }
 
+
+
+
 var cursors;
 var logo;
 
@@ -46,7 +49,7 @@ var logo;
 function create ()
 {
     var sky = this.add.image(0, 0, 'sky').setScale(1.6).setOrigin(0, 0);
-    this.physics.world.setBounds(0, 0, sky.displayWidth, sky.displayHeight);
+    // this.physics.world.setBounds(0, 0, sky.displayWidth, sky.displayHeight);
 
     // Audio
     
@@ -81,23 +84,40 @@ function create ()
 
     function addNextFile() {
 	console.log("Adding file " + uploadName);
-	let uploadedSprite = this.add.sprite(100, 100, uploadName);
-	uploadedSprite.setScale(0.5);
-	uploadedSprite.setInteractive();
-	this.input.setDraggable(uploadedSprite);
+	if (uploadName.startsWith('sprite')) {
+	    let uploadedSprite = ourGame.add.sprite(100, 100, uploadName);
+	    uploadedSprite.setScale(0.5);
+	    uploadedSprite.setInteractive();
+	    ourGame.input.setDraggable(uploadedSprite);
+	} else if (uploadName.startsWith('background')) {
+	    var background = ourGame.add.image(0, 0, uploadName).setScale(1.6).setOrigin(0, 0);
+	} else {
+	    console.log("Unknown name type:", uploadName);
+	}
     }
 
-    ourGame.load.on('filecomplete', addNextFile, ourGame);
-    
-    document.querySelector('input[type="file"]').addEventListener('change', function() {
-	if (this.files && this.files[0]) {
-	    console.log("Got files", this.files)
-            imgUrl = URL.createObjectURL(this.files[0]); // set src to blob url
-	    uploadName = Math.random().toString(36).substring(2, 15);
+    function uploadImage(prefix, input) {
+	console.log("Upload image", input);
+	if (input.files && input.files[0]) {
+	    console.log("Got files", input.files)
+            imgUrl = URL.createObjectURL(input.files[0]); // set src to blob url
+	    uploadName = prefix + Math.random().toString(36).substring(2, 15);
 	    console.log("Uploaded", uploadName);
 	    ourGame.load.image(uploadName, imgUrl);
 	    ourGame.load.start();
 	}
+    }
+
+    
+    ourGame.load.on('filecomplete', addNextFile, ourGame);
+    
+    document.querySelector('#new-sprite-input').addEventListener('change', function() {
+	uploadImage('sprite-', this);
+    });
+
+
+    document.querySelector('#background-input').addEventListener('change', function() {
+	uploadImage('background-', this);
     });
 
 }
@@ -105,6 +125,7 @@ function create ()
 function update ()
 {
 }
+
 
 
 
@@ -155,8 +176,12 @@ async function record() {
     }
 }
 
-function upload() {
-    document.querySelector('input[type="file"]').click();
+function uploadSprite() {
+    document.querySelector('#new-sprite-input').click();
+}
+
+function uploadBackground() {
+    document.querySelector('#background-input').click();
 }
 
 function stop() {

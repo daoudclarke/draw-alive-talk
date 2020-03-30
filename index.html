@@ -9,19 +9,22 @@
 </head>
 <body>
 
-  <input type='file' style="display: none"/>
+  <input type='file' id="new-sprite-input" style="display: none"/>
+  <input type='file' id="background-input" style="display: none"/>
   <!-- <script src="ffmpeg.min.js"></script> -->
   <script src="main.js"></script>
   <!-- <button id="convert" onclick="convert()">Convert</button> -->
   <a href="#" class="float record-button" onclick="record()">
-    <i id="record-button" class="fa fa-circle my-float"></i>
+    <i class="fa fa-circle my-float"></i>
   </a>
   <a href="#" class="float stop-button" onclick="stop()">
-    <i id="record-button" class="fa fa-square my-float"></i>
+    <i class="fa fa-square my-float"></i>
   </a>
-  <a href="#" class="float add-button" onclick="upload()">
-    <i id="record-button" class="fa fa-plus my-float"></i>
+  <a href="#" class="float add-button" onclick="uploadSprite()">
+    <i class="fa fa-plus my-float"></i>
   </a>
-  <!-- <button id="record" onclick="record()">Record</button> -->
+  <a href="#" class="float background-button" onclick="uploadBackground()">
+    <i class="fa fa-image my-float"></i>
+  </a>
 </body>
 </html>
