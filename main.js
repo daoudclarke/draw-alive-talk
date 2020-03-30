@@ -49,6 +49,7 @@ var logo;
 function create ()
 {
     var sky = this.add.image(0, 0, 'sky').setScale(1.6).setOrigin(0, 0);
+    sky.setDepth(1);
     // this.physics.world.setBounds(0, 0, sky.displayWidth, sky.displayHeight);
 
     // Audio
@@ -66,6 +67,7 @@ function create ()
         s.setScale(0.5);
         s.setInteractive();
         this.input.setDraggable(s);
+	s.setDepth(i+2);
     }
 
     this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
@@ -91,6 +93,7 @@ function create ()
 	    ourGame.input.setDraggable(uploadedSprite);
 	} else if (uploadName.startsWith('background')) {
 	    var background = ourGame.add.image(0, 0, uploadName).setScale(1.6).setOrigin(0, 0);
+	    background.setDepth(1);
 	} else {
 	    console.log("Unknown name type:", uploadName);
 	}
