@@ -73,12 +73,12 @@ function create ()
 	s.setDepth(spriteDepth);
     }
 
-    this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
-        gameObject.x = dragX;
-        gameObject.y = dragY;
+    // this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
+    //     gameObject.x = dragX;
+    //     gameObject.y = dragY;
 	
-	// newFrame();
-    });
+    // 	// newFrame();
+    // });
     
     this.cameras.main.setBounds(0, 0, sky.displayWidth, sky.displayHeight);
 
@@ -95,7 +95,7 @@ function create ()
 	    uploadedSprite.setInteractive();
 	    spriteDepth += 1;
 	    uploadedSprite.setDepth(spriteDepth);
-	    ourGame.input.setDraggable(uploadedSprite);
+	    // ourGame.input.setDraggable(uploadedSprite);
 	} else if (uploadName.startsWith('background')) {
 	    var background = ourGame.add.image(0, 0, uploadName).setScale(1.6).setOrigin(0, 0);
 	    background.setDepth(1);
@@ -128,6 +128,43 @@ function create ()
 	uploadImage('background-', this);
     });
 
+    // Graphics
+    let pointerDown = false;
+    var graphics = this.add.graphics();
+    graphics.setDepth(100000);
+    graphics.lineStyle(20, 0x2ECC40);
+
+    graphics.strokeRect(50, 50, 100, 40);
+
+    graphics.strokeCircle(600, 400, 64);
+
+    this.input.on('pointermove', function (pointer) {
+	if (pointerDown) {
+	    console.log(pointer.x, pointer.y);
+	    graphics.lineTo(pointer.x, pointer.y);
+	}
+    });
+
+    this.input.on('pointerdown', function (pointer) {
+        console.log('down');
+
+	pointerDown = true;
+
+	graphics.beginPath();
+
+	graphics.moveTo(pointer.x, pointer.y);
+    }, this);
+
+    this.input.on('pointerup', function (pointer) {
+        console.log('up');
+
+	pointerDown = false;
+
+	graphics.lineTo(pointer.x, pointer.y);
+	graphics.closePath();
+	graphics.strokePath();
+
+    }, this);
 }
 
 function update ()
