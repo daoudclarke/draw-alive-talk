@@ -138,10 +138,15 @@ function create ()
 
     graphics.strokeCircle(600, 400, 64);
 
+    var oldX;
+    var oldY;
+    
     this.input.on('pointermove', function (pointer) {
 	if (pointerDown) {
-	    console.log(pointer.x, pointer.y);
-	    graphics.lineTo(pointer.x, pointer.y);
+	    // console.log(pointer.x, pointer.y);
+	    graphics.lineBetween(oldX, oldY, pointer.x, pointer.y);
+	    oldX = pointer.x;
+	    oldY = pointer.y;
 	}
     });
 
@@ -149,21 +154,14 @@ function create ()
         console.log('down');
 
 	pointerDown = true;
-
-	graphics.beginPath();
-
-	graphics.moveTo(pointer.x, pointer.y);
+	oldX = pointer.x;
+	oldY = pointer.y;
     }, this);
 
     this.input.on('pointerup', function (pointer) {
         console.log('up');
 
 	pointerDown = false;
-
-	graphics.lineTo(pointer.x, pointer.y);
-	graphics.closePath();
-	graphics.strokePath();
-
     }, this);
 }
 
