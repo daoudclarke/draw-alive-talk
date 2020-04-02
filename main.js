@@ -133,6 +133,7 @@ function create ()
     var graphics = this.add.graphics();
     graphics.setDepth(100000);
     graphics.lineStyle(20, 0x2ECC40);
+    graphics.fillStyle(0x2ECC40);
 
     graphics.strokeRect(50, 50, 100, 40);
 
@@ -145,6 +146,7 @@ function create ()
 	if (pointerDown) {
 	    // console.log(pointer.x, pointer.y);
 	    graphics.lineBetween(oldX, oldY, pointer.x, pointer.y);
+	    graphics.fillCircle(pointer.x, pointer.y, 10);
 	    oldX = pointer.x;
 	    oldY = pointer.y;
 	}
@@ -154,6 +156,7 @@ function create ()
         console.log('down');
 
 	pointerDown = true;
+	graphics.fillCircle(pointer.x, pointer.y, 10);
 	oldX = pointer.x;
 	oldY = pointer.y;
     }, this);
