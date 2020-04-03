@@ -1,3 +1,60 @@
+class BrushStroke extends Phaser.GameObjects.Graphics {
+
+    constructor (scene)
+    {
+        super(scene);
+
+	this.points = [];
+        // this.setScale(4);
+    }
+
+    addPoint(x, y)
+    {
+	this.points.push([x, y]);
+    }
+
+    update()
+    {
+	this.clear();
+	this.setDepth(100000);
+	this.lineStyle(20, 0x2ECC40);
+	this.fillStyle(0x2ECC40);
+    
+	var oldPoint = null;
+	var newPoint;
+	for (var i=0; i<this.points.length; ++i) {
+	    newPoint = {x: this.points[i][0] + randomInt(), y: this.points[i][1] + randomInt()}
+	    if (oldPoint !== null) {
+		this.lineBetween(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
+		this.fillCircle(oldPoint.x, oldPoint.y, 10);
+	    }
+	    // console.log("New point", newPoint);
+	    oldPoint = newPoint;
+	}
+
+	if (newPoint != null) {
+	    this.fillCircle(newPoint.x, newPoint.y, 10);
+	}
+    }
+}
+
+class BrushStrokePlugin extends Phaser.Plugins.BasePlugin {
+
+    constructor (pluginManager)
+    {
+        super(pluginManager);
+
+        //  Register our new Game Object type
+        pluginManager.registerGameObject('brushstroke', this.createBrushStroke);
+    }
+
+    createBrushStroke (x, y)
+    {
+        return this.displayList.add(new BrushStroke(this.scene, x, y));
+    }
+
+}
+
 var config = {
     type: Phaser.CANVAS,
     width: 1280,
@@ -18,7 +75,12 @@ var config = {
 	autoCenter: Phaser.Scale.CENTER_BOTH,
 	// width: DEFAULT_WIDTH,
 	// height: DEFAULT_HEIGHT
-    }
+    },
+    plugins: {
+        global: [
+            { key: 'BrushStrokePlugin', plugin: BrushStrokePlugin, start: true }
+        ]
+    },
 };
 
 var game = new Phaser.Game(config);
@@ -136,14 +198,16 @@ function create ()
     let pointerDown = false;
     points = [[100, 200], [300, 400]];
     
-    graphics = this.add.graphics();
-
+    graphics = this.add.brushstroke();
+    graphics.setActive(true);
+    
     // graphics.strokeCircle(600, 400, 64);
 
     this.input.on('pointermove', function (pointer) {
 	if (pointerDown) {
 	    // console.log(pointer.x, pointer.y);
-	    points.push({x: pointer.x, y: pointer.y});
+	    graphics.addPoint(pointer.x, pointer.y);
+	    // points.push({x: pointer.x, y: pointer.y});
 	}
     });
 
@@ -151,11 +215,12 @@ function create ()
         console.log('down');
 
 	pointerDown = true;
-	points.push({x: pointer.x, y: pointer.y});
+	graphics.addPoint(pointer.x, pointer.y);
+	// points.push({x: pointer.x, y: pointer.y});
     }, this);
 
     this.input.on('pointerup', function (pointer) {
-        console.log('up', points);
+        // console.log('up', points);
 
 	pointerDown = false;
     }, this);
@@ -163,32 +228,33 @@ function create ()
 
 function update ()
 {
-    graphics.clear();
-    graphics.setDepth(100000);
-    graphics.lineStyle(20, 0x2ECC40);
-    graphics.fillStyle(0x2ECC40);
-    
-    // graphics.strokeRect(50, 50, 100, 40);
-
-
+    graphics.update();
+    // graphics.clear();
     // graphics.setDepth(100000);
     // graphics.lineStyle(20, 0x2ECC40);
-
-    var oldPoint = null;
-    var newPoint;
-    for (var i=0; i<points.length; ++i) {
-	newPoint = {x: points[i].x + randomInt(), y: points[i].y + randomInt()}
-	if (oldPoint !== null) {
-	    graphics.lineBetween(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
-	    graphics.fillCircle(oldPoint.x, oldPoint.y, 10);
-	}
-	
-	oldPoint = newPoint;
-    }
-
-    graphics.fillCircle(newPoint.x, newPoint.y, 10);
+    // graphics.fillStyle(0x2ECC40);
     
-    // graphics.strokePoints(newPoints);
+    // // graphics.strokeRect(50, 50, 100, 40);
+
+
+    // // graphics.setDepth(100000);
+    // // graphics.lineStyle(20, 0x2ECC40);
+
+    // var oldPoint = null;
+    // var newPoint;
+    // for (var i=0; i<points.length; ++i) {
+    // 	newPoint = {x: points[i].x + randomInt(), y: points[i].y + randomInt()}
+    // 	if (oldPoint !== null) {
+    // 	    graphics.lineBetween(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
+    // 	    graphics.fillCircle(oldPoint.x, oldPoint.y, 10);
+    // 	}
+	
+    // 	oldPoint = newPoint;
+    // }
+
+    // graphics.fillCircle(newPoint.x, newPoint.y, 10);
+    
+    // // graphics.strokePoints(newPoints);
 }
 
 
