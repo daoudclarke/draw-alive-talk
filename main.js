@@ -48,6 +48,10 @@ var logo;
 
 var spriteDepth = 1000;
 
+
+var points;
+var graphics;
+
 function create ()
 {
     var sky = this.add.image(0, 0, 'sky').setScale(1.6).setOrigin(0, 0);
@@ -130,25 +134,16 @@ function create ()
 
     // Graphics
     let pointerDown = false;
-    var graphics = this.add.graphics();
-    graphics.setDepth(100000);
-    graphics.lineStyle(20, 0x2ECC40);
-    graphics.fillStyle(0x2ECC40);
-
-    graphics.strokeRect(50, 50, 100, 40);
-
-    graphics.strokeCircle(600, 400, 64);
-
-    var oldX;
-    var oldY;
+    points = [[100, 200], [300, 400]];
     
+    graphics = this.add.graphics();
+
+    // graphics.strokeCircle(600, 400, 64);
+
     this.input.on('pointermove', function (pointer) {
 	if (pointerDown) {
 	    // console.log(pointer.x, pointer.y);
-	    graphics.lineBetween(oldX, oldY, pointer.x, pointer.y);
-	    graphics.fillCircle(pointer.x, pointer.y, 10);
-	    oldX = pointer.x;
-	    oldY = pointer.y;
+	    points.push({x: pointer.x, y: pointer.y});
 	}
     });
 
@@ -156,13 +151,11 @@ function create ()
         console.log('down');
 
 	pointerDown = true;
-	graphics.fillCircle(pointer.x, pointer.y, 10);
-	oldX = pointer.x;
-	oldY = pointer.y;
+	points.push({x: pointer.x, y: pointer.y});
     }, this);
 
     this.input.on('pointerup', function (pointer) {
-        console.log('up');
+        console.log('up', points);
 
 	pointerDown = false;
     }, this);
@@ -170,6 +163,16 @@ function create ()
 
 function update ()
 {
+    graphics.clear();
+    graphics.setDepth(100000);
+    graphics.lineStyle(20, 0x2ECC40);
+
+    // graphics.strokeRect(50, 50, 100, 40);
+
+
+    // graphics.setDepth(100000);
+    // graphics.lineStyle(20, 0x2ECC40);
+    graphics.strokePoints(points);
 }
 
 
