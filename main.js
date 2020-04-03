@@ -172,9 +172,19 @@ function update ()
 
     // graphics.setDepth(100000);
     // graphics.lineStyle(20, 0x2ECC40);
-    graphics.strokePoints(points);
+
+    newPoints = [];
+    for (var i=0; i<points.length; ++i) {
+	newPoints.push({x: points[i].x + randomInt(), y: points[i].y + randomInt()});
+    }
+
+    graphics.strokePoints(newPoints);
 }
 
+
+function randomInt() {
+    return (Math.random() - 0.5) * 3; 
+}
 
 
 
