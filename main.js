@@ -166,24 +166,34 @@ function update ()
     graphics.clear();
     graphics.setDepth(100000);
     graphics.lineStyle(20, 0x2ECC40);
-
+    graphics.fillStyle(0x2ECC40);
+    
     // graphics.strokeRect(50, 50, 100, 40);
 
 
     // graphics.setDepth(100000);
     // graphics.lineStyle(20, 0x2ECC40);
 
-    newPoints = [];
+    var oldPoint = null;
+    var newPoint;
     for (var i=0; i<points.length; ++i) {
-	newPoints.push({x: points[i].x + randomInt(), y: points[i].y + randomInt()});
+	newPoint = {x: points[i].x + randomInt(), y: points[i].y + randomInt()}
+	if (oldPoint !== null) {
+	    graphics.lineBetween(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
+	    graphics.fillCircle(oldPoint.x, oldPoint.y, 10);
+	}
+	
+	oldPoint = newPoint;
     }
 
-    graphics.strokePoints(newPoints);
+    graphics.fillCircle(newPoint.x, newPoint.y, 10);
+    
+    // graphics.strokePoints(newPoints);
 }
 
 
 function randomInt() {
-    return (Math.random() - 0.5) * 3; 
+    return (Math.random() - 0.5) * 2; 
 }
 
 
