@@ -197,9 +197,8 @@ function create ()
     // Graphics
     let pointerDown = false;
     points = [[100, 200], [300, 400]];
-    
-    graphics = this.add.brushstroke();
-    graphics.setActive(true);
+
+    var group = this.add.group({runChildUpdate: true});
     
     // graphics.strokeCircle(600, 400, 64);
 
@@ -213,6 +212,8 @@ function create ()
 
     this.input.on('pointerdown', function (pointer) {
         console.log('down');
+	graphics = this.add.brushstroke();
+	group.add(graphics);
 
 	pointerDown = true;
 	graphics.addPoint(pointer.x, pointer.y);
@@ -228,7 +229,7 @@ function create ()
 
 function update ()
 {
-    graphics.update();
+    // graphics.update();
     // graphics.clear();
     // graphics.setDepth(100000);
     // graphics.lineStyle(20, 0x2ECC40);
