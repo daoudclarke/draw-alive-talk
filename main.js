@@ -4,36 +4,45 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
     {
         super(scene);
 
-	this.points = [];
-        // this.setScale(4);
+	this.stroke = {points: [], color: 0xffffff, width: 20};
+	this.strokes = [this.stroke];
     }
 
     addPoint(x, y)
     {
-	this.points.push([x, y]);
+	this.stroke.points.push([x, y]);
     }
 
+    setColor(color)
+    {
+	console.log('set color', color);
+	this.stroke.color = color;
+    }
+    
     update()
     {
 	this.clear();
 	this.setDepth(100000);
-	this.lineStyle(20, 0x2ECC40);
-	this.fillStyle(0x2ECC40);
-    
-	var oldPoint = null;
-	var newPoint;
-	for (var i=0; i<this.points.length; ++i) {
-	    newPoint = {x: this.points[i][0] + randomInt(), y: this.points[i][1] + randomInt()}
-	    if (oldPoint !== null) {
-		this.lineBetween(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
-		this.fillCircle(oldPoint.x, oldPoint.y, 10);
+	for (var i=0; i<this.strokes.length; ++i) {
+	    var stroke = this.strokes[i];
+	    this.lineStyle(stroke.width, stroke.color);
+	    this.fillStyle(stroke.color);
+	    
+	    var oldPoint = null;
+	    var newPoint;
+	    for (var i=0; i<stroke.points.length; ++i) {
+		newPoint = {x: stroke.points[i][0] + randomInt(), y: stroke.points[i][1] + randomInt()}
+		if (oldPoint !== null) {
+		    this.lineBetween(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
+		    this.fillCircle(oldPoint.x, oldPoint.y, 10);
+		}
+		// console.log("New point", newPoint);
+		oldPoint = newPoint;
 	    }
-	    // console.log("New point", newPoint);
-	    oldPoint = newPoint;
-	}
 
-	if (newPoint != null) {
-	    this.fillCircle(newPoint.x, newPoint.y, 10);
+	    if (newPoint != null) {
+		this.fillCircle(newPoint.x, newPoint.y, 10);
+	    }
 	}
     }
 }
@@ -48,9 +57,9 @@ class BrushStrokePlugin extends Phaser.Plugins.BasePlugin {
         pluginManager.registerGameObject('brushstroke', this.createBrushStroke);
     }
 
-    createBrushStroke (x, y)
+    createBrushStroke(color)
     {
-        return this.displayList.add(new BrushStroke(this.scene, x, y));
+        return this.displayList.add(new BrushStroke(this.scene));
     }
 
 }
@@ -113,6 +122,8 @@ var spriteDepth = 1000;
 
 var points;
 var graphics;
+var color = '#2ECC40';
+var isDrawing = false;
 
 function create ()
 {
@@ -139,12 +150,12 @@ function create ()
 	s.setDepth(spriteDepth);
     }
 
-    // this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
-    //     gameObject.x = dragX;
-    //     gameObject.y = dragY;
+    this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
+        gameObject.x = dragX;
+        gameObject.y = dragY;
 	
-    // 	// newFrame();
-    // });
+    	// newFrame();
+    });
     
     this.cameras.main.setBounds(0, 0, sky.displayWidth, sky.displayHeight);
 
@@ -161,7 +172,7 @@ function create ()
 	    uploadedSprite.setInteractive();
 	    spriteDepth += 1;
 	    uploadedSprite.setDepth(spriteDepth);
-	    // ourGame.input.setDraggable(uploadedSprite);
+	    ourGame.input.setDraggable(uploadedSprite);
 	} else if (uploadName.startsWith('background')) {
 	    var background = ourGame.add.image(0, 0, uploadName).setScale(1.6).setOrigin(0, 0);
 	    background.setDepth(1);
@@ -194,36 +205,48 @@ function create ()
 	uploadImage('background-', this);
     });
 
+    colorPicker = document.getElementById('color-picker');
+    colorPicker.addEventListener('change', function() {
+	color = colorPicker.value;
+    });
+
+
     // Graphics
     let pointerDown = false;
     points = [[100, 200], [300, 400]];
 
     var group = this.add.group({runChildUpdate: true});
+    // group.setInteractive();
+    // this.input.setDraggable(group);
     
     // graphics.strokeCircle(600, 400, 64);
 
     this.input.on('pointermove', function (pointer) {
-	if (pointerDown) {
-	    // console.log(pointer.x, pointer.y);
-	    graphics.addPoint(pointer.x, pointer.y);
-	    // points.push({x: pointer.x, y: pointer.y});
-	}
+    	if (pointerDown && isDrawing) {
+    	    // console.log(pointer.x, pointer.y);
+    	    graphics.addPoint(pointer.x, pointer.y);
+    	    // points.push({x: pointer.x, y: pointer.y});
+    	}
     });
 
     this.input.on('pointerdown', function (pointer) {
-        console.log('down');
-	graphics = this.add.brushstroke();
-	group.add(graphics);
+	if (isDrawing) {
+            console.log('down');
+    	    console.log('color', color);
+    	    graphics = this.add.brushstroke();
+    	    graphics.setColor(Phaser.Display.Color.ValueToColor(color).color);
+    	    group.add(graphics);
+    	    graphics.addPoint(pointer.x, pointer.y);
+	}
 
-	pointerDown = true;
-	graphics.addPoint(pointer.x, pointer.y);
-	// points.push({x: pointer.x, y: pointer.y});
+    	pointerDown = true;
+    	// points.push({x: pointer.x, y: pointer.y});
     }, this);
 
     this.input.on('pointerup', function (pointer) {
         // console.log('up', points);
 
-	pointerDown = false;
+    	pointerDown = false;
     }, this);
 }
 
@@ -322,4 +345,21 @@ function uploadBackground() {
 
 function stop() {
     recorder.stop();
+}
+
+function closeDrawOptions() {
+    document.getElementById('draw-options').hidden = true;
+}
+
+function openDrawOptions() {
+    document.getElementById('draw-options').hidden = false;
+}
+
+function toggleDraw() {
+    isDrawing = !isDrawing;
+    if (isDrawing) {
+	document.getElementById('draw-button').classList.add('using');
+    } else {
+	document.getElementById('draw-button').classList.remove('using');
+    }
 }

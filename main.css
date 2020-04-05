@@ -37,6 +37,36 @@ body{
 	left:280px;
 }
 
+.draw-button {
+	top:40px;
+	left:360px;
+}
+
+.draw-options-button {
+	top:40px;
+	left:440px;
+}
+
 .my-float{
 	margin-top:22px;
+}
+
+.float.using {
+    color: #f00;
+}
+
+.floating-div {
+    position:fixed;
+    background-color:#fff;
+    color:#000;
+    box-shadow: 2px 2px 3px #999;
+    top: 50px;
+    left: 50px;
+    width: 1200px;
+    height: 640px;
+}
+
+.floating-div input {
+    padding: 10px;
+    margin: 50px;
 }
