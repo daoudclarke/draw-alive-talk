@@ -6,25 +6,48 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 
 	this.stroke = {points: [], color: 0xffffff, width: 20};
 	this.strokes = [this.stroke];
+	this.rect = null;
     }
 
     addPoint(x, y)
     {
 	this.stroke.points.push([x, y]);
+	if (this.rect === null) {
+	    this.rect = new Phaser.Geom.Rectangle(x - this.stroke.width/2, y - this.stroke.width/2, this.stroke.width, this.stroke.width);
+	} else {
+	    this.rect.left = Math.min(this.rect.left, x - this.stroke.width/2);
+	    this.rect.right = Math.max(this.rect.right, x + this.stroke.width/2);
+	    this.rect.top = Math.min(this.rect.top, y - this.stroke.width/2);
+	    this.rect.bottom = Math.max(this.rect.bottom, y + this.stroke.width/2);
+	}
     }
 
+    getRect()
+    {
+	if (this.rect === null) {
+	    return new Phaser.Geom.Rectangle(0, 0, 0, 0);
+	}
+	return this.rect;
+    }
+    
     setColor(color)
     {
 	console.log('set color', color);
 	this.stroke.color = color;
+    }
+
+    startNewStroke()
+    {
+	this.stroke = {points: [], color: 0xffffff, width: 20};
+	this.strokes.push(this.stroke);
     }
     
     update()
     {
 	this.clear();
 	this.setDepth(100000);
-	for (var i=0; i<this.strokes.length; ++i) {
-	    var stroke = this.strokes[i];
+	for (var j=0; j<this.strokes.length; ++j) {
+	    var stroke = this.strokes[j];
 	    this.lineStyle(stroke.width, stroke.color);
 	    this.fillStyle(stroke.color);
 	    
@@ -124,6 +147,7 @@ var points;
 var graphics;
 var color = '#2ECC40';
 var isDrawing = false;
+var ourGame;
 
 function create ()
 {
@@ -159,7 +183,7 @@ function create ()
     
     this.cameras.main.setBounds(0, 0, sky.displayWidth, sky.displayHeight);
 
-    let ourGame = this;
+    ourGame = this;
 
 
     let uploadName = null; 
@@ -233,7 +257,7 @@ function create ()
 	if (isDrawing) {
             console.log('down');
     	    console.log('color', color);
-    	    graphics = this.add.brushstroke();
+    	    graphics.startNewStroke();
     	    graphics.setColor(Phaser.Display.Color.ValueToColor(color).color);
     	    group.add(graphics);
     	    graphics.addPoint(pointer.x, pointer.y);
@@ -357,8 +381,19 @@ function openDrawOptions() {
 
 function toggleDraw() {
     isDrawing = !isDrawing;
+    console.log("Toggle", isDrawing);
     if (isDrawing) {
 	document.getElementById('draw-button').classList.add('using');
+	graphics = ourGame.add.brushstroke();
+        graphics.setInteractive(graphics.getRect(), function(hitArea, x, y, gameObject) {
+	    console.log("Hit", hitArea, x, y, gameObject);
+	    if (graphics.rect === null) {
+		return false;
+	    }
+	    return x >= graphics.rect.left && x <= graphics.rect.right && y > graphics.rect.top && y <= graphics.rect.bottom;
+	});
+        ourGame.input.setDraggable(graphics);
+	
     } else {
 	document.getElementById('draw-button').classList.remove('using');
     }
