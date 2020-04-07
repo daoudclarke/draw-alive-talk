@@ -315,7 +315,7 @@ function randomInt() {
 var recording = null;
 var recorder = null;
 async function record() {
-    recordButtonClasses = document.getElementById("record-button").classList;
+    recordButtonClasses = document.getElementById("record-button-content").classList;
     if (recorder === null) {
 	recordButtonClasses.remove('fa-circle');
 	recordButtonClasses.add('fa-pause');
