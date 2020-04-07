@@ -386,11 +386,14 @@ function toggleDraw() {
 	document.getElementById('draw-button').classList.add('using');
 	graphics = ourGame.add.brushstroke();
         graphics.setInteractive(graphics.getRect(), function(hitArea, x, y, gameObject) {
-	    console.log("Hit", hitArea, x, y, gameObject);
-	    if (graphics.rect === null) {
+	    if (isDrawing) {
 		return false;
 	    }
-	    return x >= graphics.rect.left && x <= graphics.rect.right && y > graphics.rect.top && y <= graphics.rect.bottom;
+	    console.log("Hit", hitArea, x, y, gameObject);
+	    if (gameObject.rect === null) {
+		return false;
+	    }
+	    return x >= gameObject.rect.left && x <= gameObject.rect.right && y > gameObject.rect.top && y <= gameObject.rect.bottom;
 	});
         ourGame.input.setDraggable(graphics);
 	
