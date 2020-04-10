@@ -4,7 +4,7 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
     {
         super(scene);
 
-	this.stroke = {points: [], color: 0xffffff, width: 20};
+	this.stroke = {points: [], color: 0xffffff, width: 20, fillColor: 0xffffff, fillAlpha: 0.5};
 	this.strokes = [this.stroke];
 	this.rect = null;
     }
@@ -38,7 +38,7 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 
     startNewStroke()
     {
-	this.stroke = {points: [], color: 0xffffff, width: 20};
+	this.stroke = {points: [], color: 0xffffff, width: 20, fillColor: 0xffffff, fillAlpha: 0.5};
 	this.strokes.push(this.stroke);
     }
     
@@ -48,11 +48,18 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 	this.setDepth(100000);
 	for (var j=0; j<this.strokes.length; ++j) {
 	    var stroke = this.strokes[j];
-	    this.lineStyle(stroke.width, stroke.color);
-	    this.fillStyle(stroke.color);
 	    
 	    var oldPoint = null;
 	    var newPoint;
+
+	    if (stroke.points.length > 2) {
+		this.fillStyle(stroke.fillColor, stroke.fillAlpha);
+		this.fillPoints(stroke.points, true, true);
+	    }
+
+	    this.lineStyle(stroke.width, stroke.color);
+	    this.fillStyle(stroke.color, 1.0);
+
 	    for (var i=0; i<stroke.points.length; ++i) {
 		newPoint = {x: stroke.points[i].x + randomInt(), y: stroke.points[i].y + randomInt()}
 		if (oldPoint !== null) {
@@ -65,10 +72,6 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 
 	    if (newPoint != null) {
 		this.fillCircle(newPoint.x, newPoint.y, 10);
-	    }
-
-	    if (stroke.points.length > 2) {
-		this.fillPoints(stroke.points, true, true);
 	    }
 	}
     }
