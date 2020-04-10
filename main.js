@@ -4,8 +4,9 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
     {
         super(scene);
 
-	this.stroke = {points: [], color: 0xffffff, width: 20, fillColor: 0xffffff, fillAlpha: 0.5};
-	this.strokes = [this.stroke];
+	this.settings = {color: 0xffffff, width: 20, fillColor: 0xffffff, fillAlpha: 0.5};
+	this.strokes = [];
+	this.stroke = null;
 	this.rect = null;
     }
 
@@ -33,12 +34,21 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
     setColor(color)
     {
 	console.log('set color', color);
-	this.stroke.color = color;
+	this.settings.color = color;
     }
 
+    setFillColor(color) {
+	this.stroke.fillColor = color;
+    }
+
+    setFillAlpha(alpha) {
+	this.stroke.fillAlpha = alpha;
+    }
+    
     startNewStroke()
     {
-	this.stroke = {points: [], color: 0xffffff, width: 20, fillColor: 0xffffff, fillAlpha: 0.5};
+	this.stroke = {points: []}
+	Object.assign(this.stroke, this.settings);
 	this.strokes.push(this.stroke);
     }
     
@@ -264,8 +274,8 @@ function create ()
 	if (isDrawing) {
             console.log('down');
     	    console.log('color', color);
-    	    graphics.startNewStroke();
     	    graphics.setColor(Phaser.Display.Color.ValueToColor(color).color);
+    	    graphics.startNewStroke();
     	    group.add(graphics);
     	    graphics.addPoint(pointer.x, pointer.y);
 	}
