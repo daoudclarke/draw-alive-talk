@@ -11,7 +11,7 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 
     addPoint(x, y)
     {
-	this.stroke.points.push([x, y]);
+	this.stroke.points.push(new Phaser.Geom.Point(x, y));
 	if (this.rect === null) {
 	    this.rect = new Phaser.Geom.Rectangle(x - this.stroke.width/2, y - this.stroke.width/2, this.stroke.width, this.stroke.width);
 	} else {
@@ -54,7 +54,7 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 	    var oldPoint = null;
 	    var newPoint;
 	    for (var i=0; i<stroke.points.length; ++i) {
-		newPoint = {x: stroke.points[i][0] + randomInt(), y: stroke.points[i][1] + randomInt()}
+		newPoint = {x: stroke.points[i].x + randomInt(), y: stroke.points[i].y + randomInt()}
 		if (oldPoint !== null) {
 		    this.lineBetween(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 		    this.fillCircle(oldPoint.x, oldPoint.y, 10);
@@ -65,6 +65,10 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 
 	    if (newPoint != null) {
 		this.fillCircle(newPoint.x, newPoint.y, 10);
+	    }
+
+	    if (stroke.points.length > 2) {
+		this.fillPoints(stroke.points, true, true);
 	    }
 	}
     }
