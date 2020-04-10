@@ -38,11 +38,11 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
     }
 
     setFillColor(color) {
-	this.stroke.fillColor = color;
+	this.settings.fillColor = color;
     }
 
     setFillAlpha(alpha) {
-	this.stroke.fillAlpha = alpha;
+	this.settings.fillAlpha = alpha;
     }
     
     startNewStroke()
@@ -248,7 +248,7 @@ function create ()
 
     colorPicker = document.getElementById('color-picker');
     colorPicker.addEventListener('change', function() {
-	color = colorPicker.value;
+    	graphics.setColor(Phaser.Display.Color.ValueToColor(colorPicker.value).color);
     });
 
 
@@ -274,7 +274,6 @@ function create ()
 	if (isDrawing) {
             console.log('down');
     	    console.log('color', color);
-    	    graphics.setColor(Phaser.Display.Color.ValueToColor(color).color);
     	    graphics.startNewStroke();
     	    group.add(graphics);
     	    graphics.addPoint(pointer.x, pointer.y);
@@ -399,6 +398,7 @@ function openDrawOptions() {
 function toggleDraw() {
     isDrawing = !isDrawing;
     console.log("Toggle", isDrawing);
+    document.getElementById('draw-options-button').hidden = !isDrawing;
     if (isDrawing) {
 	document.getElementById('draw-button').classList.add('using');
 	graphics = ourGame.add.brushstroke();
