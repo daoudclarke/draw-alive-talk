@@ -4,7 +4,7 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
     {
         super(scene);
 
-	this.settings = {color: 0xffffff, width: 20, fillColor: 0xffffff, fillAlpha: 0.5};
+	this.settings = {color: 0xffffff, width: 20, fillColor: 0xffffff, fillAlpha: 0.5, vibration: 2};
 	this.strokes = [];
 	this.stroke = null;
 	this.rect = null;
@@ -48,6 +48,10 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
     setStrokeWidth(width) {
 	this.settings.width = width;
     }
+
+    setVibration(vibration) {
+	this.settings.vibration = vibration;
+    }
     
     startNewStroke()
     {
@@ -76,7 +80,7 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 		this.fillStyle(stroke.color, 1.0);
 
 		for (var i=0; i<stroke.points.length; ++i) {
-		    newPoint = {x: stroke.points[i].x + randomInt(), y: stroke.points[i].y + randomInt()}
+		    newPoint = {x: stroke.points[i].x + randomInt(stroke.vibration), y: stroke.points[i].y + randomInt(stroke.vibration)}
 		    if (oldPoint !== null) {
 			this.lineBetween(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 			this.fillCircle(oldPoint.x, oldPoint.y, stroke.width/2);
@@ -261,6 +265,12 @@ function create ()
 	console.log("Stroke width", strokeWidthRange.value);
     	graphics.setStrokeWidth(strokeWidthRange.value);
     });
+    
+    vibrationPicker = document.getElementById('vibration-picker');
+    vibrationPicker.addEventListener('change', function() {
+	console.log("Vibration", vibrationPicker.value);
+    	graphics.setVibration(vibrationPicker.value);
+    });
 
     fillColorPicker = document.getElementById('fill-color-picker');
     fillColorPicker.addEventListener('change', function() {
@@ -343,8 +353,8 @@ function update ()
 }
 
 
-function randomInt() {
-    return (Math.random() - 0.5) * 2; 
+function randomInt(amount) {
+    return (Math.random() - 0.5) * amount; 
 }
 
 
