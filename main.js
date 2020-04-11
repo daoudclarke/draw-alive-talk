@@ -71,21 +71,23 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 		this.fillPoints(stroke.points, true, true);
 	    }
 
-	    this.lineStyle(stroke.width, stroke.color);
-	    this.fillStyle(stroke.color, 1.0);
+	    if (stroke.width > 0) {
+		this.lineStyle(stroke.width, stroke.color);
+		this.fillStyle(stroke.color, 1.0);
 
-	    for (var i=0; i<stroke.points.length; ++i) {
-		newPoint = {x: stroke.points[i].x + randomInt(), y: stroke.points[i].y + randomInt()}
-		if (oldPoint !== null) {
-		    this.lineBetween(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
-		    this.fillCircle(oldPoint.x, oldPoint.y, stroke.width/2);
+		for (var i=0; i<stroke.points.length; ++i) {
+		    newPoint = {x: stroke.points[i].x + randomInt(), y: stroke.points[i].y + randomInt()}
+		    if (oldPoint !== null) {
+			this.lineBetween(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
+			this.fillCircle(oldPoint.x, oldPoint.y, stroke.width/2);
+		    }
+		    // console.log("New point", newPoint);
+		    oldPoint = newPoint;
 		}
-		// console.log("New point", newPoint);
-		oldPoint = newPoint;
-	    }
 
-	    if (newPoint != null) {
-		this.fillCircle(newPoint.x, newPoint.y, stroke.width/2);
+		if (newPoint != null) {
+		    this.fillCircle(newPoint.x, newPoint.y, stroke.width/2);
+		}
 	    }
 	}
     }
