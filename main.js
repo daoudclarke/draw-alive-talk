@@ -451,10 +451,11 @@ function toggleDraw() {
 }
 
 
-// window.addEventListener('load', (event) => {
-//     mediaStreamMissing = (typeof MediaStream === 'undefined');
-//     mediaRecordMissing = (typeof MediaRecorder === 'undefined');
-//     if (mediaStreamMissing || mediaRecordMissing) {
-// 	Window.alert("Your browser doesn't support recording on this app (it needs MediaStream and MediaRecorder). Please try the latest Firefox or Chrome browser.");
-//     }
-// });
+window.addEventListener('load', (event) => {
+    mediaStreamMissing = (typeof MediaStream === 'undefined');
+    mediaRecordMissing = (typeof MediaRecorder === 'undefined');
+    userMediaMissing = (typeof navigator.mediaDevices.getUserMedia === 'undefined');
+    if (mediaStreamMissing || mediaRecordMissing || userMediaMissing) {
+	window.alert("Your browser doesn't support recording on this app (it needs MediaStream and MediaRecorder). Please try the latest Firefox or Chrome browser.");
+    }
+});
