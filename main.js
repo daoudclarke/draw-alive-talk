@@ -70,17 +70,19 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 	    var oldPoint = null;
 	    var newPoint;
 
-	    if (stroke.points.length > 2) {
+	    var newPoints = randomizePoints(stroke.points, stroke.vibration);
+	    
+	    if (newPoints.length > 2) {
 		this.fillStyle(stroke.fillColor, stroke.fillAlpha);
-		this.fillPoints(stroke.points, true, true);
+		this.fillPoints(newPoints, true, true);
 	    }
 
 	    if (stroke.width > 0) {
 		this.lineStyle(stroke.width, stroke.color);
 		this.fillStyle(stroke.color, 1.0);
 
-		for (var i=0; i<stroke.points.length; ++i) {
-		    newPoint = {x: stroke.points[i].x + randomInt(stroke.vibration), y: stroke.points[i].y + randomInt(stroke.vibration)}
+		for (var i=0; i<newPoints.length; ++i) {
+		    newPoint = newPoints[i];
 		    if (oldPoint !== null) {
 			this.lineBetween(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 			this.fillCircle(oldPoint.x, oldPoint.y, stroke.width/2);
@@ -96,6 +98,17 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 	}
     }
 }
+
+
+function randomizePoints(points, vibration) {
+    let newPoints = [];
+    for (var i=0; i<points.length; ++i) {
+	newPoint = {x: points[i].x + randomInt(vibration), y: points[i].y + randomInt(vibration)}
+	newPoints.push(newPoint);
+    }
+    return newPoints;
+}
+
 
 class BrushStrokePlugin extends Phaser.Plugins.BasePlugin {
 
