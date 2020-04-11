@@ -139,8 +139,7 @@ var config = {
     },
     scene: {
         preload: preload,
-        create: create,
-        update: update
+        create: create
     },
     scale: {
 	mode: Phaser.Scale.FIT,
@@ -332,37 +331,6 @@ function create ()
 
     	pointerDown = false;
     }, this);
-}
-
-function update ()
-{
-    // graphics.update();
-    // graphics.clear();
-    // graphics.setDepth(100000);
-    // graphics.lineStyle(20, 0x2ECC40);
-    // graphics.fillStyle(0x2ECC40);
-    
-    // // graphics.strokeRect(50, 50, 100, 40);
-
-
-    // // graphics.setDepth(100000);
-    // // graphics.lineStyle(20, 0x2ECC40);
-
-    // var oldPoint = null;
-    // var newPoint;
-    // for (var i=0; i<points.length; ++i) {
-    // 	newPoint = {x: points[i].x + randomInt(), y: points[i].y + randomInt()}
-    // 	if (oldPoint !== null) {
-    // 	    graphics.lineBetween(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
-    // 	    graphics.fillCircle(oldPoint.x, oldPoint.y, 10);
-    // 	}
-	
-    // 	oldPoint = newPoint;
-    // }
-
-    // graphics.fillCircle(newPoint.x, newPoint.y, 10);
-    
-    // // graphics.strokePoints(newPoints);
 }
 
 
