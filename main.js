@@ -44,6 +44,10 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
     setFillAlpha(alpha) {
 	this.settings.fillAlpha = alpha;
     }
+
+    setStrokeWidth(width) {
+	this.settings.width = width;
+    }
     
     startNewStroke()
     {
@@ -74,14 +78,14 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 		newPoint = {x: stroke.points[i].x + randomInt(), y: stroke.points[i].y + randomInt()}
 		if (oldPoint !== null) {
 		    this.lineBetween(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
-		    this.fillCircle(oldPoint.x, oldPoint.y, 10);
+		    this.fillCircle(oldPoint.x, oldPoint.y, stroke.width/2);
 		}
 		// console.log("New point", newPoint);
 		oldPoint = newPoint;
 	    }
 
 	    if (newPoint != null) {
-		this.fillCircle(newPoint.x, newPoint.y, 10);
+		this.fillCircle(newPoint.x, newPoint.y, stroke.width/2);
 	    }
 	}
     }
@@ -162,7 +166,6 @@ var spriteDepth = 1000;
 
 var points;
 var graphics;
-var color = '#2ECC40';
 var isDrawing = false;
 var ourGame;
 
@@ -251,6 +254,23 @@ function create ()
     	graphics.setColor(Phaser.Display.Color.ValueToColor(colorPicker.value).color);
     });
 
+    strokeWidthRange = document.getElementById('stroke-width');
+    strokeWidthRange.addEventListener('change', function() {
+	console.log("Stroke width", strokeWidthRange.value);
+    	graphics.setStrokeWidth(strokeWidthRange.value);
+    });
+
+    fillColorPicker = document.getElementById('fill-color-picker');
+    fillColorPicker.addEventListener('change', function() {
+    	graphics.setFillColor(Phaser.Display.Color.ValueToColor(fillColorPicker.value).color);
+    });
+
+    fillAlphaPicker = document.getElementById('fill-alpha-picker');
+    fillAlphaPicker.addEventListener('change', function() {
+	console.log("Fill alpha", fillAlphaPicker.value);
+    	graphics.setFillAlpha(fillAlphaPicker.value);
+    });
+    
 
     // Graphics
     let pointerDown = false;
@@ -273,7 +293,6 @@ function create ()
     this.input.on('pointerdown', function (pointer) {
 	if (isDrawing) {
             console.log('down');
-    	    console.log('color', color);
     	    graphics.startNewStroke();
     	    group.add(graphics);
     	    graphics.addPoint(pointer.x, pointer.y);

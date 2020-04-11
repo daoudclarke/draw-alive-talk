@@ -34,7 +34,27 @@
   </a>
 
   <div id="draw-options" class="floating-div" hidden>
-    <input type="color" id="color-picker">
+    <div>
+      <input type="color" id="color-picker">
+      <label for="color-picker">Stroke color</label>
+    </div>
+    
+    <div>
+      <input type="range" id="stroke-width" name="stroke-width"
+             min="0" max="100">
+      <label for="stroke-width">Stroke width</label>
+    </div>
+
+    <div>
+      <input type="color" id="fill-color-picker">
+      <label for="fill-color-picker">Fill color</label>
+    </div>
+
+    <div>
+      <input type="range" id="fill-alpha-picker" min="0.0" max="1.0" step="0.0001">
+      <label for="fill-alpha-picker">Fill transparency</label>
+    </div>
+
     <input type="button"  id="draw-close" value="Close" onclick="closeDrawOptions()">
   </div>
 
