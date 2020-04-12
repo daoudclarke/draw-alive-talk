@@ -47,9 +47,14 @@ body{
 	left:440px;
 }
 
-.draw-options-button {
+.redo-button {
 	top:40px;
 	left:520px;
+}
+
+.draw-options-button {
+	top:40px;
+	left:600px;
 }
 
 .my-float{

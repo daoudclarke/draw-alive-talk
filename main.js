@@ -493,3 +493,7 @@ window.addEventListener('load', (event) => {
 function undo() {
     undoer.undo();
 }
+
+function redo() {
+    undoer.redo();
+}
