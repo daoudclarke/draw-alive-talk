@@ -13,13 +13,35 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
     addPoint(x, y)
     {
 	this.stroke.points.push(new Phaser.Geom.Point(x, y));
+	this.updateRectForPoint(x, y, this.stroke.width);
+    }
+
+    updateRectForPoint(x, y, width)
+    {
 	if (this.rect === null) {
-	    this.rect = new Phaser.Geom.Rectangle(x - this.stroke.width/2, y - this.stroke.width/2, this.stroke.width, this.stroke.width);
+	    this.rect = new Phaser.Geom.Rectangle(x - width/2, y - width/2, width, width);
 	} else {
-	    this.rect.left = Math.min(this.rect.left, x - this.stroke.width/2);
-	    this.rect.right = Math.max(this.rect.right, x + this.stroke.width/2);
-	    this.rect.top = Math.min(this.rect.top, y - this.stroke.width/2);
-	    this.rect.bottom = Math.max(this.rect.bottom, y + this.stroke.width/2);
+	    this.rect.left = Math.min(this.rect.left, x - width/2);
+	    this.rect.right = Math.max(this.rect.right, x + width/2);
+	    this.rect.top = Math.min(this.rect.top, y - width/2);
+	    this.rect.bottom = Math.max(this.rect.bottom, y + width/2);
+	}
+    }
+
+    updateRectForStroke(stroke)
+    {
+	for (var j=0; j < stroke.points.length; ++j) {
+	    var point = stroke.points[j];
+	    this.updateRectForPoint(point.x, point.y, stroke.width);
+	}
+    }
+    
+    resetRect()
+    {
+	this.rect = null;
+	for (var i=0; i< this.strokes.length; ++i) {
+	    var stroke = this.strokes[i];
+	    this.updateRectForStroke(stroke);
 	}
     }
 
@@ -55,7 +77,7 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
     
     startNewStroke()
     {
-	this.stroke = {points: []}
+	this.stroke = {points: []};
 	Object.assign(this.stroke, this.settings);
 	this.strokes.push(this.stroke);
     }
@@ -64,12 +86,14 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
     {
 	var last = this.strokes.pop();
 	this.stroke = null;
+	this.resetRect();
 	return () => this.uAddStroke(last);
     }
 
     uAddStroke(stroke)
     {
 	this.strokes.push(stroke);
+	this.updateRectForStroke(stroke);
 	return () => this.uRemoveLastStroke();
     }
     
@@ -106,7 +130,7 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 
 		if (newPoint != null) {
 		    this.fillCircle(newPoint.x, newPoint.y, stroke.width/2);
-		}
+                }
 	    }
 	}
     }
@@ -467,7 +491,7 @@ function toggleDraw() {
 	    if (isDrawing) {
 		return false;
 	    }
-	    console.log("Hit", hitArea, x, y, gameObject);
+	    // console.log("Hit", hitArea, x, y, gameObject);
 	    if (gameObject.rect === null) {
 		return false;
 	    }
