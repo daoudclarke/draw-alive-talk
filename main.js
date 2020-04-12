@@ -59,6 +59,19 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 	Object.assign(this.stroke, this.settings);
 	this.strokes.push(this.stroke);
     }
+
+    uRemoveLastStroke()
+    {
+	var last = this.strokes.pop();
+	this.stroke = null;
+	return () => this.uAddStroke(last);
+    }
+
+    uAddStroke(stroke)
+    {
+	this.strokes.push(stroke);
+	return () => this.uRemoveLastStroke();
+    }
     
     update()
     {
@@ -126,6 +139,38 @@ class BrushStrokePlugin extends Phaser.Plugins.BasePlugin {
     }
 
 }
+
+
+class Undoer {
+
+    constructor() {
+	this.undoList = [];
+	this.redoList = [];
+    }
+
+    push(action) {
+	this.undoList.push(action);
+    }
+
+    undo() {
+	if (this.undoList.length > 0) {
+	    var action = this.undoList.pop();
+	    var redoAction = action();
+	    this.redoList.push(redoAction);
+	}
+    }
+
+    redo() {
+	if (this.redoList.length > 0) {
+	    var action = this.redoList.pop();
+	    var undoAction = action();
+	    this.undoList.push(undoAction);
+	}
+    }
+}
+
+var undoer = new Undoer();
+
 
 var config = {
     type: Phaser.CANVAS,
@@ -330,6 +375,10 @@ function create ()
         // console.log('up', points);
 
     	pointerDown = false;
+
+	if (isDrawing) {
+	    undoer.push(() => graphics.uRemoveLastStroke());
+	}
     }, this);
 }
 
@@ -440,3 +489,7 @@ window.addEventListener('load', (event) => {
 	window.alert("Your browser doesn't support recording on this app (it needs MediaStream and MediaRecorder). Please try the latest Firefox or Chrome browser.");
     }
 });
+
+function undo() {
+    undoer.undo();
+}

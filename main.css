@@ -42,9 +42,14 @@ body{
 	left:360px;
 }
 
-.draw-options-button {
+.undo-button {
 	top:40px;
 	left:440px;
+}
+
+.draw-options-button {
+	top:40px;
+	left:520px;
 }
 
 .my-float{
