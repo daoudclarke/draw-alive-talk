@@ -82,19 +82,19 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 	this.strokes.push(this.stroke);
     }
 
-    uRemoveLastStroke()
+    removeLastStroke()
     {
 	var last = this.strokes.pop();
 	this.stroke = null;
 	this.resetRect();
-	return () => this.uAddStroke(last);
+	return last;
     }
 
-    uAddStroke(stroke)
+    addStroke(stroke)
     {
+	this.stroke = stroke;
 	this.strokes.push(stroke);
 	this.updateRectForStroke(stroke);
-	return () => this.uRemoveLastStroke();
     }
     
     update()
@@ -177,6 +177,7 @@ class Undoer {
     }
 
     undo() {
+	console.log("Undo list", this.undoList);
 	if (this.undoList.length > 0) {
 	    var action = this.undoList.pop();
 	    var redoAction = action();
@@ -185,6 +186,7 @@ class Undoer {
     }
 
     redo() {
+	console.log("Redo list", this.redoList);
 	if (this.redoList.length > 0) {
 	    var action = this.redoList.pop();
 	    var undoAction = action();
@@ -224,6 +226,7 @@ var config = {
 };
 
 var game = new Phaser.Game(config);
+var gameObjects = [];
 
 function preload ()
 {
@@ -255,6 +258,7 @@ var points;
 var graphics;
 var isDrawing = false;
 var ourGame;
+var group;
 
 function create ()
 {
@@ -369,7 +373,7 @@ function create ()
     let pointerDown = false;
     points = [[100, 200], [300, 400]];
 
-    var group = this.add.group({runChildUpdate: true});
+    group = this.add.group({runChildUpdate: true});
     // group.setInteractive();
     // this.input.setDraggable(group);
     
@@ -387,7 +391,6 @@ function create ()
 	if (isDrawing) {
             console.log('down');
     	    graphics.startNewStroke();
-    	    group.add(graphics);
     	    graphics.addPoint(pointer.x, pointer.y);
 	}
 
@@ -401,7 +404,7 @@ function create ()
     	pointerDown = false;
 
 	if (isDrawing) {
-	    undoer.push(() => graphics.uRemoveLastStroke());
+	    undoer.push(uRemoveLastStroke);
 	}
     }, this);
 }
@@ -411,6 +414,18 @@ function randomInt(amount) {
     return (Math.random() - 0.5) * amount; 
 }
 
+
+
+function uRemoveLastStroke() {
+    var stroke = graphics.removeLastStroke();
+    return () => uAddStroke(stroke);
+}
+
+function uAddStroke(stroke) {
+    console.log("Adding stroke", stroke);
+    graphics.addStroke(stroke);
+    return () => uRemoveLastStroke();
+}
 
 
 var recording = null;
@@ -481,27 +496,49 @@ function openDrawOptions() {
 }
 
 function toggleDraw() {
+    undoAction = uToggleDraw(false);
+    undoer.push(undoAction);
+}
+
+function uToggleDraw(isUndo) {
+    console.log("Toggle start", isDrawing, isUndo, gameObjects, graphics);
     isDrawing = !isDrawing;
-    console.log("Toggle", isDrawing);
     document.getElementById('draw-options-button').hidden = !isDrawing;
     if (isDrawing) {
 	document.getElementById('draw-button').classList.add('using');
-	graphics = ourGame.add.brushstroke();
-        graphics.setInteractive(graphics.getRect(), function(hitArea, x, y, gameObject) {
-	    if (isDrawing) {
-		return false;
-	    }
-	    // console.log("Hit", hitArea, x, y, gameObject);
-	    if (gameObject.rect === null) {
-		return false;
-	    }
-	    return x >= gameObject.rect.left && x <= gameObject.rect.right && y > gameObject.rect.top && y <= gameObject.rect.bottom;
-	});
-        ourGame.input.setDraggable(graphics);
-	
+
+	if (!isUndo) {
+	    graphics = ourGame.add.brushstroke();
+    	    group.add(graphics);
+	    gameObjects.push(graphics);
+            graphics.setInteractive(graphics.getRect(), function(hitArea, x, y, gameObject) {
+		if (isDrawing) {
+		    return false;
+		}
+		// console.log("Hit", hitArea, x, y, gameObject);
+		if (gameObject.rect === null) {
+		    return false;
+		}
+		return x >= gameObject.rect.left && x <= gameObject.rect.right && y > gameObject.rect.top && y <= gameObject.rect.bottom;
+	    });
+            ourGame.input.setDraggable(graphics);
+	}
     } else {
 	document.getElementById('draw-button').classList.remove('using');
+
+	if (isUndo) {
+	    var lastGameObject = gameObjects.pop();
+	    lastGameObject.destroy();
+	    if (gameObjects.length > 0) {
+		graphics = gameObjects[gameObjects.length - 1];
+	    } else {
+		graphics = null;
+	    }
+	}
     }
+
+    console.log("Toggle end", isDrawing, isUndo, gameObjects, graphics);
+    return () => uToggleDraw(!isUndo);
 }
 
 
