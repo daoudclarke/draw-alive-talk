@@ -260,6 +260,8 @@ var isDrawing = false;
 var ourGame;
 var group;
 
+
+var beforeDragPoint;
 function create ()
 {
     var sky = this.add.image(0, 0, 'sky').setScale(1.6).setOrigin(0, 0);
@@ -284,6 +286,18 @@ function create ()
         this.input.setDraggable(s);
 	s.setDepth(spriteDepth);
     }
+
+    this.input.on('dragstart', function (pointer, gameObject, dragX, dragY) {
+	beforeDragPoint = {x: gameObject.x, y: gameObject.y};
+	
+    	// newFrame();
+    });
+    
+    this.input.on('dragend', function (pointer, gameObject, dragX, dragY) {
+	undoer.push(() => uMoveObject(gameObject, beforeDragPoint.x, beforeDragPoint.y));
+    	// newFrame();
+    });
+
 
     this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
         gameObject.x = dragX;
@@ -425,6 +439,16 @@ function uAddStroke(stroke) {
     console.log("Adding stroke", stroke);
     graphics.addStroke(stroke);
     return () => uRemoveLastStroke();
+}
+
+
+function uMoveObject(gameObject, x, y) {
+    var oldX = gameObject.x;
+    var oldY = gameObject.y;
+    gameObject.x = x;
+    gameObject.y = y;
+
+    return () => uMoveObject(gameObject, oldX, oldY);
 }
 
 
