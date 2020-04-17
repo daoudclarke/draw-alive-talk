@@ -324,6 +324,7 @@ function create ()
 	    spriteDepth += 1;
 	    uploadedSprite.setDepth(spriteDepth);
 	    ourGame.input.setDraggable(uploadedSprite);
+	    undoer.push(() => uActivateSprite(uploadedSprite, false));
 	} else if (uploadName.startsWith('background')) {
 	    var background = ourGame.add.image(0, 0, uploadName).setScale(1.6).setOrigin(0, 0);
 	    background.setDepth(1);
@@ -437,6 +438,7 @@ function uRemoveLastStroke() {
     return () => uAddStroke(stroke);
 }
 
+
 function uAddStroke(stroke) {
     console.log("Adding stroke", stroke);
     graphics.addStroke(stroke);
@@ -451,6 +453,12 @@ function uMoveObject(gameObject, x, y) {
     gameObject.y = y;
 
     return () => uMoveObject(gameObject, oldX, oldY);
+}
+
+
+function uActivateSprite(sprite, active) {
+    sprite.setActive(active).setVisible(active);
+    return () => uActivateSprite(sprite, !active);
 }
 
 
