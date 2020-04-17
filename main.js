@@ -294,7 +294,9 @@ function create ()
     });
     
     this.input.on('dragend', function (pointer, gameObject, dragX, dragY) {
-	undoer.push(() => uMoveObject(gameObject, beforeDragPoint.x, beforeDragPoint.y));
+	var x = beforeDragPoint.x;
+	var y = beforeDragPoint.y;
+	undoer.push(() => uMoveObject(gameObject, x, y));
     	// newFrame();
     });
 
