@@ -8,6 +8,7 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 	this.strokes = [];
 	this.stroke = null;
 	this.rect = null;
+	this.iter = 0;
     }
 
     addPoint(x, y)
@@ -101,6 +102,7 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
     {
 	this.clear();
 	this.setDepth(100000);
+	this.iter++;
 	for (var j=0; j<this.strokes.length; ++j) {
 	    var stroke = this.strokes[j];
 	    
@@ -115,11 +117,17 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 	    }
 
 	    if (stroke.width > 0) {
-		this.lineStyle(stroke.width, stroke.color);
-		this.fillStyle(stroke.color, 1.0);
+		
+		// this.lineStyle(stroke.width, stroke.color);
+		// this.fillStyle(stroke.color, 1.0);
 
+		var hue = 0.0;
 		for (var i=0; i<newPoints.length; ++i) {
+		    var hue = ((this.iter + i)/100) % 1.0
+		    var rainbowColor = Phaser.Display.Color.HSLToColor(hue, 1.0, 0.5).color;
 		    newPoint = newPoints[i];
+		    this.lineStyle(stroke.width, rainbowColor);
+		    this.fillStyle(rainbowColor, 1.0);
 		    if (oldPoint !== null) {
 			this.lineBetween(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 			this.fillCircle(oldPoint.x, oldPoint.y, stroke.width/2);
