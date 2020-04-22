@@ -52,9 +52,14 @@ body{
 	left:520px;
 }
 
-.draw-options-button {
+.start-new-frame-button {
 	top:40px;
 	left:600px;
+}
+
+.draw-options-button {
+	top:40px;
+	left:680px;
 }
 
 .my-float{

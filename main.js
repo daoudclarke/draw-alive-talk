@@ -5,9 +5,13 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
         super(scene);
 
 	this.settings = {color: 0xffffff, width: 20, fillColor: 0xffffff, fillAlpha: 0.5, vibration: 2};
-	this.strokes = [];
+	this.frame = null;
 	this.stroke = null;
 	this.rect = null;
+	this.frame = {strokes: []};
+	this.frames = [this.frame];
+	// this.frames.push(this.frame);
+	// this.startNewFrame();
     }
 
     addPoint(x, y)
@@ -35,13 +39,20 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 	    this.updateRectForPoint(point.x, point.y, stroke.width);
 	}
     }
+
+    updateRectForFrame(frame) {
+	for (var i=0; i < frame.strokes.length; ++i) {
+	    var stroke = frame.strokes[i];
+	    this.updateRectForStroke(stroke);
+	}
+    }
     
     resetRect()
     {
 	this.rect = null;
-	for (var i=0; i< this.strokes.length; ++i) {
-	    var stroke = this.strokes[i];
-	    this.updateRectForStroke(stroke);
+	for (var i=0; i< this.frames.length; ++i) {
+	    var frame = this.frames[i];
+	    this.updateRectForFrame(frame);
 	}
     }
 
@@ -74,17 +85,22 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
     setVibration(vibration) {
 	this.settings.vibration = vibration;
     }
+
+    startNewFrame() {
+	this.frame = {strokes: []};
+	this.frames.push(this.frame);
+    }
     
     startNewStroke()
     {
 	this.stroke = {points: []};
 	Object.assign(this.stroke, this.settings);
-	this.strokes.push(this.stroke);
+	this.frame.strokes.push(this.stroke);
     }
 
     removeLastStroke()
     {
-	var last = this.strokes.pop();
+	var last = this.frame.strokes.pop();
 	this.stroke = null;
 	this.resetRect();
 	return last;
@@ -93,7 +109,7 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
     addStroke(stroke)
     {
 	this.stroke = stroke;
-	this.strokes.push(stroke);
+	this.frame.strokes.push(stroke);
 	this.updateRectForStroke(stroke);
     }
     
@@ -101,8 +117,9 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
     {
 	this.clear();
 	this.setDepth(100000);
-	for (var j=0; j<this.strokes.length; ++j) {
-	    var stroke = this.strokes[j];
+	for (var j=0; j<this.frame.strokes.length; ++j) {
+	    var stroke = this.frame.strokes[j];
+	    console.log("Stroke", stroke);
 	    
 	    var oldPoint = null;
 	    var newPoint;
@@ -110,26 +127,26 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 	    var newPoints = randomizePoints(stroke.points, stroke.vibration);
 	    
 	    if (newPoints.length > 2) {
-		this.fillStyle(stroke.fillColor, stroke.fillAlpha);
-		this.fillPoints(newPoints, true, true);
+	    	this.fillStyle(stroke.fillColor, stroke.fillAlpha);
+	    	this.fillPoints(newPoints, true, true);
 	    }
 
 	    if (stroke.width > 0) {
-		this.lineStyle(stroke.width, stroke.color);
-		this.fillStyle(stroke.color, 1.0);
+	    	// this.lineStyle(stroke.width, stroke.color);
+	    	// this.fillStyle(stroke.color, 1.0);
 
-		for (var i=0; i<newPoints.length; ++i) {
-		    newPoint = newPoints[i];
-		    if (oldPoint !== null) {
-			this.lineBetween(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
-			this.fillCircle(oldPoint.x, oldPoint.y, stroke.width/2);
-		    }
-		    // console.log("New point", newPoint);
-		    oldPoint = newPoint;
-		}
+	    	for (var i=0; i<newPoints.length; ++i) {
+	    	    newPoint = newPoints[i];
+	    	    if (oldPoint !== null) {
+	    		this.lineBetween(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
+	    		this.fillCircle(oldPoint.x, oldPoint.y, stroke.width/2);
+	    	    }
+	    	    // console.log("New point", newPoint);
+	    	    oldPoint = newPoint;
+	    	}
 
-		if (newPoint != null) {
-		    this.fillCircle(newPoint.x, newPoint.y, stroke.width/2);
+	    	if (newPoint != null) {
+	    	    this.fillCircle(newPoint.x, newPoint.y, stroke.width/2);
                 }
 	    }
 	}
@@ -538,6 +555,7 @@ function uToggleDraw(isUndo) {
     console.log("Toggle start", isDrawing, isUndo, gameObjects, graphics);
     isDrawing = !isDrawing;
     document.getElementById('draw-options-button').hidden = !isDrawing;
+    document.getElementById('start-new-frame-button').hidden = !isDrawing;
     if (isDrawing) {
 	document.getElementById('draw-button').classList.add('using');
 
@@ -591,4 +609,8 @@ function undo() {
 
 function redo() {
     undoer.redo();
+}
+
+function startNewFrame() {
+    graphics.startNewFrame();
 }
