@@ -488,6 +488,8 @@ async function record() {
 
 	recorder.onstop = function(e) {
 	    console.log("Stopping");
+	    recordButtonClasses.remove('fa-pause');
+	    recordButtonClasses.add('fa-circle');
 	    recorder = null;
 	    stream.getTracks()[0].stop();
 	    stream.getTracks()[1].stop();
