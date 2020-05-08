@@ -286,9 +286,9 @@ function create() {
     });
 
     this.input.on('dragend', function (pointer, gameObject, dragX, dragY) {
-        var x = beforeDragPoint.x;
-        var y = beforeDragPoint.y;
-        undoer.push(() => uMoveObject(gameObject, x, y));
+		const x = beforeDragPoint.x;
+		const y = beforeDragPoint.y;
+		undoer.push(() => uMoveObject(gameObject, x, y));
         // newFrame();
     });
 
@@ -356,8 +356,8 @@ function create() {
 
     const rainbowCheckbox = document.getElementById('rainbow-checkbox');
     rainbowCheckbox.addEventListener('change', function () {
-        var color = rainbowCheckbox.checked ? 'rainbow' : Phaser.Display.Color.ValueToColor(colorPicker.value).color;
-        graphics.setColor(color);
+		const color = rainbowCheckbox.checked ? 'rainbow' : Phaser.Display.Color.ValueToColor(colorPicker.value).color;
+		graphics.setColor(color);
     });
 
     const strokeWidthRange = document.getElementById('stroke-width');
