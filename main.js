@@ -117,17 +117,20 @@ class BrushStroke extends Phaser.GameObjects.Graphics {
 	    }
 
 	    if (stroke.width > 0) {
-		
-		// this.lineStyle(stroke.width, stroke.color);
-		// this.fillStyle(stroke.color, 1.0);
 
-		var hue = 0.0;
+		if (stroke.color !== 'rainbow') {
+		    this.lineStyle(stroke.width, stroke.color);
+		    this.fillStyle(stroke.color, 1.0);
+		}
+
 		for (var i=0; i<newPoints.length; ++i) {
-		    var hue = ((this.iter + i)/100) % 1.0
-		    var rainbowColor = Phaser.Display.Color.HSLToColor(hue, 1.0, 0.5).color;
 		    newPoint = newPoints[i];
-		    this.lineStyle(stroke.width, rainbowColor);
-		    this.fillStyle(rainbowColor, 1.0);
+		    if (stroke.color === 'rainbow') {
+			const hue = ((this.iter + i)/100) % 1.0
+			const rainbowColor = Phaser.Display.Color.HSLToColor(hue, 1.0, 0.5).color;
+			this.lineStyle(stroke.width, rainbowColor);
+			this.fillStyle(rainbowColor, 1.0);
+		    }
 		    if (oldPoint !== null) {
 			this.lineBetween(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 			this.fillCircle(oldPoint.x, oldPoint.y, stroke.width/2);
@@ -368,6 +371,12 @@ function create ()
     colorPicker = document.getElementById('color-picker');
     colorPicker.addEventListener('change', function() {
     	graphics.setColor(Phaser.Display.Color.ValueToColor(colorPicker.value).color);
+    });
+
+    rainbowCheckbox = document.getElementById('rainbow-checkbox');
+    rainbowCheckbox.addEventListener('change', function() {
+	var color = rainbowCheckbox.checked ? 'rainbow' : Phaser.Display.Color.ValueToColor(colorPicker.value).color;
+    	graphics.setColor(color);
     });
 
     strokeWidthRange = document.getElementById('stroke-width');
